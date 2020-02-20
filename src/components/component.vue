@@ -47,7 +47,10 @@
                         caption:"cmd",
                         size:"cputime",  
                         community:"community",
-                        
+                        clickEvent:(properties)=>{
+                            var cmd= properties.properties.cmd
+                            document.getElementById("cmd").innerHTML=cmd
+                        }
                     },
                     
                 },
@@ -63,7 +66,6 @@
             console.log(config)
             
             var viz = new NeoVis.default(config);
-            console.log(viz)
             viz.render();
         }
         function drawAgain(size,instance1,instance2){
