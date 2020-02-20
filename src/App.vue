@@ -1,17 +1,19 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld :data="data" @changeData="changeData($event)"/>
+    <NeoVis/>
   </div>
 </template>
 
 <script lang="ts">
 import { Component,Vue,Prop } from 'vue-property-decorator'
 import HelloWorld from './components/HelloWorld.vue'
+import NeoVis from './components/component.vue'
 
 @Component({
   components: {
-    HelloWorld
+    HelloWorld,
+    NeoVis
   }
 })
 export default class App extends Vue {
