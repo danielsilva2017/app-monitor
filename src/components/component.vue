@@ -7,13 +7,13 @@
                 </div>
             </div>
                 
-            <div id="buttons" style="float:left;clear:left">
+            <div id="row buttons" style="float:left;clear:left">
 
-                <div>
+                <div class="col " style="float   :left">
                     <input type="radio" name="neovis"  value="cputime"> CPU<br>
                     <input type="radio" name="neovis" value=100> RAM<br>
                 </div>
-                <div >
+                <div class="col">
                     <select id="instance1">
                         <option value="0">Todas</option>
                         <option value="1">Instância 1</option>
@@ -31,6 +31,7 @@
                     </select>
                     <button onClick="reDraw()">Reestruturar</button>
                 </div>
+                <button class="btn btn-primary">xd</button>
             </div>
         </div>
 </template>
