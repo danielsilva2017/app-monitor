@@ -3,43 +3,54 @@
     <div>
     <div class="container">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <b-card title="Filtrar" class="bg-secondary">
-                    <div class="col" style="float   :left">
-                        <input type="radio" name="neovis" value="cputime" /> CPU
-                        <br />
-                        <input type="radio" name="neovis" value="100" /> RAM
-                        <br />
+                  
+                      <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" name="neovis" class="custom-control-input" id="cpu" value="cputime">
+                        <label class="custom-control-label" for="cpu">CPU</label>
+                      </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" name="neovis" class="custom-control-input" id="ram" value=100>
+                        <label class="custom-control-label" for="ram">RAM</label>
                     </div>
-                    <div class="col">
-                        <select id="instance1">
+                    <p></p>
+                    <div class="col-md-12">
+                        <b-select id="instance1">
                         <option value="0">Todas</option>
                         <option value="1">Instância 1</option>
                         <option value="2">Instância 2</option>
                         <option value="3">Instância 3</option>
                         <option value="4">Instância 4</option>
-                        </select>
+                        </b-select>
 
-                        <select id="instance2">
+                        <b-select id="instance2">
                         <option value="0">Todas</option>
                         <option value="1">Instância 1</option>
                         <option value="2">Instância 2</option>
                         <option value="3">Instância 3</option>
                         <option value="4">Instância 4</option>
-                        </select>
-                        <button onclick="reDraw()">Reestruturar</button>
+                        </b-select>
+                        <p></p>
+                      <div class="col-md-11">
+                       <b-button type="submit" variant="outline-success float-right" class="card-link" v-on:click="reDraw" v-b-modal.privacy>Atualizar</b-button>
+                      </div>
+                    
                     </div>
-                    <button class="btn btn-primary">xd</button>
                 </b-card>
             </div>
-            <div id="viz" class="col-md-9" ></div>
+          
+            <div id="viz" class="col-md-8" ></div>
+              <div>CMD <a id="cmd"></a></div>
         </div>
    </div>
-
+    <b-modal v-model="modalShow" centered title="Mais informação">
+      <h2> {{information}} </h2>
+    </b-modal>
   </div>
 </div>
 </template>
-<script>
+<script >
 function draw() {
   console.log("here");
   var config = {
@@ -53,8 +64,10 @@ function draw() {
         size: "cputime",
         community: "community",
         clickEvent: properties => {
+          
           var cmd = properties.properties.cmd;
           document.getElementById("cmd").innerHTML = cmd;
+          xd(cmd)
         }
       }
     },
@@ -117,6 +130,7 @@ function drawAgain(size, instance1, instance2) {
   viz.render();
 }
 function reDraw() {
+  console.log("here boys")
   var a = document.getElementById("instance1");
   var b = document.getElementById("instance2");
   var c = document.getElementsByName("neovis");
@@ -130,14 +144,44 @@ function reDraw() {
 
   drawAgain(c_value, a.value, b.value);
 }
+function xd(information){
+  console.log("here")
+  var a =new NeoVisComponent()
+  a.xd(information)
+  
+}
 
 import { Component, Vue } from "vue-property-decorator";
 
 @Component()
 export default class NeoVisComponent extends Vue {
+  modalShow=false;
+  information="teste"
+  
+  reDraw() {
+    reDraw();
+  }
+  drawAgain(a,b,c){
+    drawAgain(a,b,c);
+  }
+  xd(information){
+    console.log("supp")
+    this.information=information
+    this.modalShow=!this.modalShow
+    console.log(this.modalShow)
+    this.$bvToast.toast( "O utilizador já está convidado ou o email introduzido é inválido", {
+            title: `Erro ao Enviar Convite`,
+            variant: 'danger',
+            solid: true
+        } ); 
+    
+  }
   mounted() {
     draw();
+    console.log(this.modalShow)
   }
+
+  
 }
 </script>
 <style>
@@ -148,13 +192,8 @@ body {
 
 #viz {
   
-  height: 700px;
+  height: 500px;
   border: 1px solid lightgray;
   font: 22pt arial;
-}
-#buttons {
-  border: 1px solid black;
-  width: 800px;
-  height: 100px;
 }
 </style>
