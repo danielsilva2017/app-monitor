@@ -41,17 +41,17 @@
             </div>
           
             <div id="viz" class="col-md-8" ></div>
-              <div>CMD <a id="cmd"></a></div>
+              
         </div>
    </div>
-    <b-modal v-model="modalShow" centered title="Mais informação">
-      <h2> {{information}} </h2>
+    <b-modal size="huge" v-model="modalShow" title="Mais informação">
+      
     </b-modal>
   </div>
 </div>
 </template>
 <script >
-function draw() {
+function draw(view) {
   console.log("here");
   var config = {
     container_id: "viz",
@@ -65,9 +65,8 @@ function draw() {
         community: "community",
         clickEvent: properties => {
           
-          var cmd = properties.properties.cmd;
-          document.getElementById("cmd").innerHTML = cmd;
-          xd(cmd)
+          var cmd = properties.properties
+          view.show(cmd)
         }
       }
     },
@@ -144,12 +143,6 @@ function reDraw() {
 
   drawAgain(c_value, a.value, b.value);
 }
-function xd(information){
-  console.log("here")
-  var a =new NeoVisComponent()
-  a.xd(information)
-  
-}
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -164,7 +157,7 @@ export default class NeoVisComponent extends Vue {
   drawAgain(a,b,c){
     drawAgain(a,b,c);
   }
-  xd(information){
+  show(information){
     console.log("supp")
     this.information=information
     this.modalShow=!this.modalShow
@@ -177,7 +170,7 @@ export default class NeoVisComponent extends Vue {
     
   }
   mounted() {
-    draw();
+    draw(this);
     console.log(this.modalShow)
   }
 
@@ -195,5 +188,10 @@ body {
   height: 500px;
   border: 1px solid lightgray;
   font: 22pt arial;
+}
+
+.modal .modal-huge {
+  max-width: 80%;
+  width: 80%;
 }
 </style>
