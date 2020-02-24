@@ -11,13 +11,13 @@
                         <label class="custom-control-label" for="cpu">CPU</label>
                       </div>
                     <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" name="neovis" class="custom-control-input" id="ram" value=100>
+                        <input type="radio" name="neovis" class="custom-control-input" id="ram" value="rss">
                         <label class="custom-control-label" for="ram">RAM</label>
                     </div>
                     <p></p>
                     <div class="col-md-12">
-                        <b-select id="instance1">
-                        <option value="0">Todas</option>
+                        <b-select id="instance1" >
+                        <option value="0" selected>Todas</option>
                         <option value="1">Instância 1</option>
                         <option value="2">Instância 2</option>
                         <option value="3">Instância 3</option>
@@ -25,7 +25,7 @@
                         </b-select>
 
                         <b-select id="instance2">
-                        <option value="0">Todas</option>
+                        <option value="0" selected>Todas</option>
                         <option value="1">Instância 1</option>
                         <option value="2">Instância 2</option>
                         <option value="3">Instância 3</option>
@@ -51,7 +51,9 @@
 </div>
 </template>
 <script >
-function draw(view) {
+var op;
+async function draw(view) {
+  op=view
   console.log("here");
   var config = {
     container_id: "viz",
@@ -82,8 +84,11 @@ function draw(view) {
   };
   console.log(config);
 
-  var viz = new NeoVis.default(config);
+  var viz = await new NeoVis.default(config);
+  console.log(viz._nodes)
+  view.nodes(viz._nodes)
   viz.render();
+
 }
 function drawAgain(size, instance1, instance2) {
   var conditions;
@@ -110,7 +115,11 @@ function drawAgain(size, instance1, instance2) {
       Process: {
         caption: "cmd",
         size: size,
-        community: "community"
+        community: "community",
+        clickEvent:properties =>{
+          console.log("xd")
+          op.show()
+        }
       }
     },
     relationships: {
@@ -122,10 +131,11 @@ function drawAgain(size, instance1, instance2) {
     initial_cypher:
       "match p=(p1:Process)-[c1:CONNECTED_TO]->()<-[c2:CONNECTED_TO]-(p2:Process)    with sum(c1.sent_bytes+c2.sent_bytes)/1048576  as xd,p1,p2,c1,c2 match px=(p1)-[c1]->()<-[c2]-(p2) with sum(xd) as sumatorio,p1,p2,c1,c2 match pn=(p1)-[c1]->()<-[c2]-(p2) where sumatorio <> 0 and " +
       conditions +
-      " return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio"
+      " return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio,p1.rss,p2.rss"
   };
   console.log(config.initial_cypher);
   var viz = new NeoVis.default(config);
+  console.log(viz)
   viz.render();
 }
 function reDraw() {
@@ -144,7 +154,7 @@ function reDraw() {
   drawAgain(c_value, a.value, b.value);
 }
 
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 
 @Component()
 export default class NeoVisComponent extends Vue {
@@ -157,16 +167,17 @@ export default class NeoVisComponent extends Vue {
   drawAgain(a,b,c){
     drawAgain(a,b,c);
   }
+  async nodes(arr){
+    console.log(arr[Prop])
+    console.log("here"+JSON.stringify(arr))
+
+  }
   show(information){
     console.log("supp")
     this.information=information
     this.modalShow=!this.modalShow
     console.log(this.modalShow)
-    this.$bvToast.toast( "O utilizador já está convidado ou o email introduzido é inválido", {
-            title: `Erro ao Enviar Convite`,
-            variant: 'danger',
-            solid: true
-        } ); 
+   
     
   }
   mounted() {

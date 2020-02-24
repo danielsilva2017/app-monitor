@@ -1,7 +1,19 @@
 <template>
-  <div id="app">
+  <div class="app">
    
-    
+    <b-navbar toggleable="lg">
+        <div class="container">
+
+            <b-navbar-brand ><router-link :to="'/'">
+                Monitor
+                <span class="small text-warning font-weight-bold ml-1" >Beta</span>
+            </router-link></b-navbar-brand>
+
+            <b-collapse id="nav-collapse" is-nav>
+            </b-collapse>
+               
+        </div>
+    </b-navbar>
     <NeoVis/>
     
   </div>
