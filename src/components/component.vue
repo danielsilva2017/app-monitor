@@ -16,6 +16,21 @@
                     </div>
                     <p></p>
                     <div class="col-md-12">
+
+                        <b-select id="process1" >
+                        <option value="0" selected>Todos</option>
+                         <option v-for="item in labels" :value="item" :key="item.id">
+      {{ item }}
+    </option>
+    
+                        </b-select>
+                         <b-select id="process2" >
+                        <option value="0" selected>Todos</option>
+                         <option v-for="item in labels" :value="item" :key="item.id">
+      {{ item }}
+    </option>
+    
+                        </b-select>
                         <b-select id="instance1" >
                         <option value="0" selected>Todas</option>
                         <option value="1">Instância 1</option>
@@ -85,27 +100,40 @@ async function draw(view) {
   console.log(config);
 
   var viz = await new NeoVis.default(config);
+  console.log(viz)
   console.log(viz._nodes)
-  view.nodes(viz._nodes)
+  viz.registerOnEvent( 'completed', () => {
+    view.nodes(viz._nodes)
+} );
+
   viz.render();
 
 }
-function drawAgain(size, instance1, instance2) {
+function drawAgain(size, instance1, instance2,process1,process2) {
   var conditions;
   console.log("x" + size);
   if (size == undefined) {
     console.log("xd");
   }
+  
   if (instance1 != "0") {
-    conditions = "p1.host contains '" + instance1 + "'";
+    conditions = "p1.host contains '" + instance1 + "' ";
   } else {
-    conditions = "p1.host contains 'inst'";
+    conditions = "p1.host contains 'inst' ";
   }
   if (instance2 != "0") {
-    conditions += " and p2.host contains '" + instance2 + "'";
+    conditions += " and p2.host contains '" + instance2 + "' ";
   } else {
-    conditions += " and p2.host contains 'inst'";
+    conditions += " and p2.host contains 'inst' ";
   }
+  if (process1 != "0") {
+    conditions += " and p1.cmd contains '" + process1 + "' ";
+  } 
+  if (process2 != "0") {
+    conditions += " and p2.cmd contains '" + process2 + "' ";
+  } 
+  
+  
   var config = {
     container_id: "viz",
     server_url: "bolt://localhost:7687",
@@ -142,6 +170,8 @@ function reDraw() {
   console.log("here boys")
   var a = document.getElementById("instance1");
   var b = document.getElementById("instance2");
+  var d = document.getElementById("process1");
+  var e = document.getElementById("process2");
   var c = document.getElementsByName("neovis");
   var c_value;
   for (var i = 0; i < c.length; i++) {
@@ -151,15 +181,16 @@ function reDraw() {
     }
   }
 
-  drawAgain(c_value, a.value, b.value);
+  drawAgain(c_value, a.value, b.value,d.value,e.value);
 }
 
 import { Component, Vue, Prop } from "vue-property-decorator";
-
+import {nodes} from '../assets/nodes.js'
 @Component()
 export default class NeoVisComponent extends Vue {
   modalShow=false;
   information="teste"
+  labels =[];
   
   reDraw() {
     reDraw();
@@ -167,10 +198,15 @@ export default class NeoVisComponent extends Vue {
   drawAgain(a,b,c){
     drawAgain(a,b,c);
   }
-  async nodes(arr){
-    console.log(arr[Prop])
-    console.log("here"+JSON.stringify(arr))
-
+  nodes(arr){
+    console.log(arr)
+    
+    for(let key in arr){
+      console.log(arr[key].label)
+      if(!this.labels.includes(arr[key].label)  && arr[key].label!="Socket"){
+        this.labels.push(arr[key].label)
+      }
+    }
   }
   show(information){
     console.log("supp")
