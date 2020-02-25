@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-4">
                 <b-card title="Filtrar" class="bg-secondary">
-                  
+                  <b-card-sub-title class="mb-2">Recurso</b-card-sub-title>
                       <div class="custom-control custom-radio custom-control-inline">
                         <input checked  type="radio" name="neovis" class="custom-control-input" id="cpu" value="cputime">
                         <label class="custom-control-label"  for="cpu">CPU</label>
@@ -15,8 +15,7 @@
                         <label class="custom-control-label" for="ram">RAM</label>
                     </div>
                     <p></p>
-                    <div class="col-md-12">
-
+                        <b-card-sub-title class="mb-2">Primeiro Processo</b-card-sub-title>
                         <b-select v-model="process1" id="process1" >
                         <option value="0" selected>Todos</option>
                          <option v-for="item in labels" :value="item" :key="item.id">
@@ -24,6 +23,8 @@
     </option>
     
                         </b-select>
+                        <p></p>
+                        <b-card-sub-title class="mb-2">Segundo Processo</b-card-sub-title>
                          <b-select v-model="process2" id="process2" >
                         <option value="0" selected>Todos</option>
                          <option v-for="item in labels" :value="item" :key="item.id">
@@ -31,6 +32,8 @@
     </option>
     
                         </b-select>
+                        <p></p>
+                        <b-card-sub-title class="mb-2">Primeiro Host/Instância</b-card-sub-title>
                         <b-select v-model="instance1" id="instance1" >
                         <option value="0" selected>Todas</option>
                         <option value="1">Instância 1</option>
@@ -38,7 +41,8 @@
                         <option value="3">Instância 3</option>
                         <option value="4">Instância 4</option>
                         </b-select>
-
+                        <p></p>
+                         <b-card-sub-title class="mb-2">Segundo Host/Instância</b-card-sub-title>
                         <b-select v-model="instance2" id="instance2">
                         <option value="0" selected>Todas</option>
                         <option value="1">Instância 1</option>
@@ -47,11 +51,9 @@
                         <option value="4">Instância 4</option>
                         </b-select>
                         <p></p>
-                      <div class="col-md-11">
                        <b-button type="submit" variant="outline-success float-right" class="card-link" v-on:click="reDraw" v-b-modal.privacy>Atualizar</b-button>
-                      </div>
+                       
                     
-                    </div>
                 </b-card>
             </div>
           
@@ -59,8 +61,93 @@
               
         </div>
    </div>
-    <b-modal size="huge" v-model="modalShow" title="Mais informação">
-      
+    <b-modal size="huge" v-model="modalShow" :title="choosenNode">
+      <div>
+        <b-card no-body>
+          <b-tabs card>
+            <b-tab title="Informacao" active>
+              <b-card-text>
+                  <b-form-group>
+                      <template v-slot:prepend>
+                          <b-input-group-text>
+                          </b-input-group-text>
+                      </template>
+                      <b-form-input
+                              id="profSituation"
+                              :placeholder="information.comm"
+                              trim
+                              readonly>
+                      </b-form-input>
+                  </b-form-group>
+                  <b-form-group>
+                      <template v-slot:prepend>
+                          <b-input-group-text>
+                          </b-input-group-text>
+                      </template>
+                      <b-form-input
+                              id="profSituation"
+                              :placeholder="information.cmd"
+                              trim
+                              readonly>
+                      </b-form-input>
+                  </b-form-group>
+                  <b-form-group>
+                      <template v-slot:prepend>
+                          <b-input-group-text>
+                          </b-input-group-text>
+                      </template>
+                      <b-form-input
+                              id="profSituation"
+                              :placeholder="information.pid"
+                              trim
+                              readonly>
+                      </b-form-input>
+                  </b-form-group>
+                  <b-form-group>
+                      <template v-slot:prepend>
+                          <b-input-group-text>
+                          </b-input-group-text>
+                      </template>
+                      <b-form-input
+                              id="profSituation"
+                              :placeholder="information.host"
+                              trim
+                              readonly>
+                      </b-form-input>
+                  </b-form-group>
+                   <b-form-group>
+                      <template v-slot:prepend>
+                          <b-input-group-text>
+                          </b-input-group-text>
+                      </template>
+                      <b-form-input
+                              id="profSituation"
+                              :placeholder="information.rss"
+                              trim
+                              readonly>
+                      </b-form-input>
+                  </b-form-group>
+                  <b-form-group>
+                      <template v-slot:prepend>
+                          <b-input-group-text>
+                          </b-input-group-text>
+                      </template>
+                      <b-form-input
+                              id="profSituation"
+                              :placeholder="information.cont"
+                              trim
+                              readonly>
+                      </b-form-input>
+                  </b-form-group>
+              </b-card-text>
+            </b-tab>
+            <b-tab title="Ação">
+              <b-card-text>Acao</b-card-text>
+            </b-tab>
+          </b-tabs>
+        </b-card>
+      </div>
+
     </b-modal>
   </div>
 </div>
@@ -84,6 +171,9 @@ async function draw(view) {
           
           var cmd = properties.properties
           view.show(cmd)
+          view.choosenNode=properties.properties.cmd
+          console.log("supp"+properties.properties.name)
+          view.fill(properties.properties)
         }
       }
     },
@@ -146,7 +236,11 @@ function drawAgain(size, instance1, instance2,process1,process2) {
         community: "community",
         clickEvent:properties =>{
           console.log("xd")
+          
           op.show()
+          op.choosenNode=properties.properties.cmd
+          op.fill(properties.properties)
+
         }
       }
     },
@@ -195,6 +289,8 @@ export default class NeoVisComponent extends Vue {
   instance2="0";
   process1="0";
   process2="0";
+  choosenNode=null;
+  information={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null}
   
   reDraw() {
     reDraw();
@@ -216,9 +312,18 @@ export default class NeoVisComponent extends Vue {
     console.log("supp")
     this.information=information
     this.modalShow=!this.modalShow
-    console.log(this.modalShow)
    
     
+  }
+
+  async fill(information){
+    this.information.cmd=information.cmd
+    this.information.host=information.host
+    this.information.comm=information.comm
+    this.information.rss=information.rss/1024
+    this.information.rss=this.information.rss.toString()+" MB"
+    this.information.pid=information.ppid
+    this.information.cont=information.cont
   }
   mounted() {
     draw(this);
@@ -231,7 +336,7 @@ export default class NeoVisComponent extends Vue {
 <style>
 html,
 body {
-  font: 16pt arial;
+  font: 12pt arial;
 }
 
 #viz {
@@ -244,5 +349,9 @@ body {
 .modal .modal-huge {
   max-width: 80%;
   width: 80%;
+}
+
+.form{
+   font-size: 40px important!
 }
 </style>
