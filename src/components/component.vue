@@ -7,8 +7,8 @@
                 <b-card title="Filtrar" class="bg-secondary">
                   
                       <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" name="neovis" class="custom-control-input" id="cpu" value="cputime">
-                        <label class="custom-control-label" for="cpu">CPU</label>
+                        <input checked  type="radio" name="neovis" class="custom-control-input" id="cpu" value="cputime">
+                        <label class="custom-control-label"  for="cpu">CPU</label>
                       </div>
                     <div class="custom-control custom-radio custom-control-inline">
                         <input type="radio" name="neovis" class="custom-control-input" id="ram" value="rss">
@@ -17,21 +17,21 @@
                     <p></p>
                     <div class="col-md-12">
 
-                        <b-select id="process1" >
+                        <b-select v-model="process1" id="process1" >
                         <option value="0" selected>Todos</option>
                          <option v-for="item in labels" :value="item" :key="item.id">
       {{ item }}
     </option>
     
                         </b-select>
-                         <b-select id="process2" >
+                         <b-select v-model="process2" id="process2" >
                         <option value="0" selected>Todos</option>
                          <option v-for="item in labels" :value="item" :key="item.id">
       {{ item }}
     </option>
     
                         </b-select>
-                        <b-select id="instance1" >
+                        <b-select v-model="instance1" id="instance1" >
                         <option value="0" selected>Todas</option>
                         <option value="1">Instância 1</option>
                         <option value="2">Instância 2</option>
@@ -39,7 +39,7 @@
                         <option value="4">Instância 4</option>
                         </b-select>
 
-                        <b-select id="instance2">
+                        <b-select v-model="instance2" id="instance2">
                         <option value="0" selected>Todas</option>
                         <option value="1">Instância 1</option>
                         <option value="2">Instância 2</option>
@@ -191,6 +191,10 @@ export default class NeoVisComponent extends Vue {
   modalShow=false;
   information="teste"
   labels =[];
+  instance1="0";
+  instance2="0";
+  process1="0";
+  process2="0";
   
   reDraw() {
     reDraw();
