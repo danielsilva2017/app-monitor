@@ -183,6 +183,7 @@ async function draw(view) {
         thickness: "sent_bytes"
       }
     },
+    hierarchical_sort_method:"hubsize",
 
     initial_cypher:
       "match p=(p1:Process)-[c1:CONNECTED_TO]->()<-[c2:CONNECTED_TO]-(p2:Process)    with sum(c1.sent_bytes+c2.sent_bytes)/1048576  as xd,p1,p2,c1,c2 match px=(p1)-[c1]->()<-[c2]-(p2) with sum(xd) as sumatorio,p1,p2,c1,c2 match pn=(p1)-[c1]->()<-[c2]-(p2) where sumatorio <> 0  return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio"
@@ -233,7 +234,7 @@ function drawAgain(size, instance1, instance2,process1,process2) {
       Process: {
         caption: "cmd",
         size: size,
-        community: "community",
+        community: "host",
         clickEvent:properties =>{
           console.log("xd")
           
@@ -308,10 +309,9 @@ export default class NeoVisComponent extends Vue {
       }
     }
   }
-  show(information){
+  show(){
     console.log("supp")
-    this.information=information
-    this.modalShow=!this.modalShow
+    this.modalShow=true
    
     
   }
