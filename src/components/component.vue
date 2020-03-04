@@ -156,7 +156,6 @@
 var op;
 async function draw(view) {
   op=view
-  console.log("here");
   var config = {
     container_id: "viz",
     server_url: "bolt://localhost:7687",
@@ -166,14 +165,17 @@ async function draw(view) {
       Process: {
         caption: "cmd",
         size: "cputime",
-        community: "community",
+        community: "host",
         clickEvent: properties => {
           
           var cmd = properties.properties
-          view.show(cmd)
-          view.choosenNode=properties.properties.cmd
-          console.log("supp"+properties.properties.name)
-          view.fill(properties.properties)
+          console.log(properties.properties.fake)
+          if(properties.properties.fake==undefined){
+            
+             view.show(cmd)
+            view.choosenNode=properties.properties.cmd
+            view.fill(properties.properties)
+          }
         }
       }
     },
@@ -183,7 +185,6 @@ async function draw(view) {
         thickness: "sent_bytes"
       }
     },
-    hierarchical_sort_method:"hubsize",
 
     initial_cypher:
       "match p=(p1:Process)-[c1:CONNECTED_TO]->()<-[c2:CONNECTED_TO]-(p2:Process)    with sum(c1.sent_bytes+c2.sent_bytes)/1048576  as xd,p1,p2,c1,c2 match px=(p1)-[c1]->()<-[c2]-(p2) with sum(xd) as sumatorio,p1,p2,c1,c2 match pn=(p1)-[c1]->()<-[c2]-(p2) where sumatorio <> 0  return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio"
@@ -191,8 +192,6 @@ async function draw(view) {
   console.log(config);
 
   var viz = await new NeoVis.default(config);
-  console.log(viz)
-  console.log(viz._nodes)
   viz.registerOnEvent( 'completed', () => {
     view.nodes(viz._nodes)
 } );
@@ -204,7 +203,7 @@ function drawAgain(size, instance1, instance2,process1,process2) {
   var conditions;
   console.log("x" + size);
   if (size == undefined) {
-    console.log("xd");
+    size="cputime"
   }
   
   if (instance1 != "0") {
@@ -236,11 +235,12 @@ function drawAgain(size, instance1, instance2,process1,process2) {
         size: size,
         community: "host",
         clickEvent:properties =>{
-          console.log("xd")
-          
-          op.show()
-          op.choosenNode=properties.properties.cmd
-          op.fill(properties.properties)
+            console.log(properties.properties.fake)
+            if(properties.properties.fake!=undefined){
+              view.show(cmd)
+              view.choosenNode=properties.properties.cmd
+              view.fill(properties.properties)
+          }
 
         }
       }
@@ -256,9 +256,7 @@ function drawAgain(size, instance1, instance2,process1,process2) {
       conditions +
       " return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio,p1.rss,p2.rss"
   };
-  console.log(config.initial_cypher);
   var viz = new NeoVis.default(config);
-  console.log(viz)
   viz.render();
 }
 function reDraw() {
@@ -300,21 +298,18 @@ export default class NeoVisComponent extends Vue {
     drawAgain(a,b,c);
   }
   nodes(arr){
-    console.log(arr)
+    
     
     for(let key in arr){
-      console.log(arr[key].label)
-      if(!this.labels.includes(arr[key].label)  && arr[key].label!="Socket"){
+      if(!this.labels.includes(arr[key].label)  && arr[key].label!="Socket" && arr[key].label!=undefined && arr[key].originalProperties.fake!="true" ){
         this.labels.push(arr[key].label)
       }
     }
-  }
-  show(){
-    console.log("supp")
-    this.modalShow=true
-   
     
   }
+  show(){
+    this.modalShow=true
+ }
 
   async fill(information){
     this.information.cmd=information.cmd
@@ -327,7 +322,6 @@ export default class NeoVisComponent extends Vue {
   }
   mounted() {
     draw(this);
-    console.log(this.modalShow)
   }
 
   
