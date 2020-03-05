@@ -169,7 +169,6 @@ async function draw(view) {
         clickEvent: properties => {
           
           var cmd = properties.properties
-          console.log(properties.properties.fake)
           if(properties.properties.fake==undefined){
             
              view.show(cmd)
@@ -189,19 +188,18 @@ async function draw(view) {
     initial_cypher:
       "match p=(p1:Process)-[c1:CONNECTED_TO]->()<-[c2:CONNECTED_TO]-(p2:Process)    with sum(c1.sent_bytes+c2.sent_bytes)/1048576  as xd,p1,p2,c1,c2 match px=(p1)-[c1]->()<-[c2]-(p2) with sum(xd) as sumatorio,p1,p2,c1,c2 match pn=(p1)-[c1]->()<-[c2]-(p2) where sumatorio <> 0  return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio"
   };
-  console.log(config);
 
   var viz = await new NeoVis.default(config);
   viz.registerOnEvent( 'completed', () => {
     view.nodes(viz._nodes)
 } );
 
-  viz.render();
+  await viz.render();
+  console.log("final")
 
 }
 function drawAgain(size, instance1, instance2,process1,process2) {
   var conditions;
-  console.log("x" + size);
   if (size == undefined) {
     size="cputime"
   }
