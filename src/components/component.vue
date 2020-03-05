@@ -193,8 +193,10 @@ async function draw(view) {
   viz.registerOnEvent( 'completed', () => {
     view.nodes(viz._nodes)
 } );
-
-  await viz.render();
+  
+  var array = getArray()
+  await saveToArray()
+  await viz.render(array);
   console.log("final")
 
 }
@@ -277,6 +279,7 @@ function reDraw() {
 
 import { Component, Vue, Prop } from "vue-property-decorator";
 import {nodes} from '../assets/nodes.js'
+import {getArray, saveToArray} from '../../public/json'
 @Component()
 export default class NeoVisComponent extends Vue {
   modalShow=false;
