@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-4">
                 <b-card title="Filtrar" class="bg-secondary">
-                  <b-card-sub-title class="mb-2">Recurso</b-card-sub-title>
+                  <b-card-sub-title class="mb-2">Recurso:</b-card-sub-title>
                       <div class="custom-control custom-radio custom-control-inline">
                         <input checked  type="radio" name="neovis" class="custom-control-input" id="cpu" value="cputime">
                         <label class="custom-control-label"  for="cpu">CPU</label>
@@ -13,6 +13,16 @@
                     <div class="custom-control custom-radio custom-control-inline">
                         <input type="radio" name="neovis" class="custom-control-input" id="ram" value="rss">
                         <label class="custom-control-label" for="ram">RAM</label>
+                    </div>
+                    <p></p>
+                      <b-card-sub-title class="mb-2">Organizar por:</b-card-sub-title>
+                      <div class="custom-control custom-radio custom-control-inline">
+                        <input checked  type="radio" name="orderBy" class="custom-control-input" id="instancia" value="normal">
+                        <label class="custom-control-label"  for="instancia">Instância</label>
+                      </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" name="orderBy" class="custom-control-input" id="process" value="process">
+                        <label class="custom-control-label" for="process">Processo</label>
                     </div>
                     <p></p>
                         <b-card-sub-title class="mb-2">Primeiro Processo</b-card-sub-title>
@@ -195,13 +205,13 @@ async function draw(view) {
 } );
   
   var array = getArray()
-  await saveToArray()
-  await viz.render(array);
+  await viz.render(array,"normal");
   console.log("final")
 
 }
-function drawAgain(size, instance1, instance2,process1,process2) {
+function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
   var conditions;
+  console.log("...."+orderBy)
   if (size == undefined) {
     size="cputime"
   }
@@ -235,7 +245,6 @@ function drawAgain(size, instance1, instance2,process1,process2) {
         size: size,
         community: "host",
         clickEvent:properties =>{
-            console.log(properties.properties.fake)
             if(properties.properties.fake!=undefined){
               view.show(cmd)
               view.choosenNode=properties.properties.cmd
@@ -257,15 +266,16 @@ function drawAgain(size, instance1, instance2,process1,process2) {
       " return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio,p1.rss,p2.rss"
   };
   var viz = new NeoVis.default(config);
-  viz.render();
+  var array = getArray()
+ viz.render(array,orderBy);
 }
 function reDraw() {
-  console.log("here boys")
   var a = document.getElementById("instance1");
   var b = document.getElementById("instance2");
   var d = document.getElementById("process1");
   var e = document.getElementById("process2");
   var c = document.getElementsByName("neovis");
+  var f =document.querySelector('input[name = orderBy]:checked').value;
   var c_value;
   for (var i = 0; i < c.length; i++) {
     if (c[i].checked) {
@@ -274,7 +284,7 @@ function reDraw() {
     }
   }
 
-  drawAgain(c_value, a.value, b.value,d.value,e.value);
+  drawAgain(c_value, a.value, b.value,d.value,e.value,f);
 }
 
 import { Component, Vue, Prop } from "vue-property-decorator";
