@@ -152,11 +152,65 @@
               </b-card-text>
             </b-tab>
             <b-tab title="Ação">
-              <b-card-text>Acao</b-card-text>
+              <b-card-text>Tipo : {{type}}
+
+                <b-form-group>
+                      <template v-slot:prepend>
+                          <b-input-group-text>
+                          </b-input-group-text>
+                      </template>
+                      <p></p>
+                      <b-card-sub-title class="mb-2">Réplicas</b-card-sub-title>
+                      <b-form-input
+                              id="replicas  "
+                              :placeholder="replicas"
+                              v-model="finalInformation.replicas"
+                              trim>
+                      </b-form-input>
+                      <p></p>
+                       <b-card-sub-title class="mb-2">Limite de  CPU</b-card-sub-title>
+                      <b-form-input
+                              id="replicas "
+                              :placeholder="replicas"
+                              v-model="finalInformation.limitcpu"
+                              trim>
+                      </b-form-input>
+                      <p></p>
+                       <b-card-sub-title class="mb-2">Limite de Memória </b-card-sub-title>
+                      <b-form-input
+                              id="replicas  "
+                              :placeholder="replicas"
+                              v-model="finalInformation.limitmemory"
+                              trim>
+                      </b-form-input>
+                      <p></p>
+                       <b-card-sub-title class="mb-2">Request CPU</b-card-sub-title>
+                      <b-form-input
+                              id="replicas "
+                              :placeholder="replicas"
+                              v-model="finalInformation.requestcpu"
+                              trim>
+                      </b-form-input>
+                      <p></p>
+                       <b-card-sub-title class="mb-2">Request Memory</b-card-sub-title>
+                      <b-form-input
+                              id="replicas  "
+                              :placeholder="replicas"
+                              v-model="finalInformation.requestmemory"
+                              trim>
+                      </b-form-input>
+                  </b-form-group>
+             
+              </b-card-text>
             </b-tab>
           </b-tabs>
         </b-card>
       </div>
+      <template v-slot:modal-footer="{ cancel, ok }">
+            <b-button variant="outline-secondary" v-on:click="cancel()">Cancelar</b-button>
+            <span class="flex-fill"></span>
+            <b-button variant="warning" v-on:click="updateAll();ok()">Gravar</b-button>
+     </template>
 
     </b-modal>
   </div>
@@ -164,24 +218,26 @@
 </template>
 <script >
 var op;
+
 async function draw(view) {
   op=view
   var config = {
     container_id: "viz",
-    server_url: "bolt://localhost:7687",
-    server_user: "snow",
-    server_password: "snow123",
+    server_url: "neo4j://127.0.0.1:7687",
+    server_user: "neo4j",
+    server_password: "123456",
     labels: {
       Process: {
         caption: "cmd",
         size: "cputime",
         community: "host",
         clickEvent: properties => {
-          
+          console.log("op")
           var cmd = properties.properties
           if(properties.properties.fake==undefined){
+            console.log("here")
             
-             view.show(cmd)
+             view.show(properties.properties.cont)
             view.choosenNode=properties.properties.cmd
             view.fill(properties.properties)
           }
@@ -189,14 +245,14 @@ async function draw(view) {
       }
     },
     relationships: {
-      CONNECTED_TO: {
+      NoSocket2: {
         caption: false,
-        thickness: "sent_bytes"
+        thickness: "finish"
       }
     },
 
     initial_cypher:
-      "match p=(p1:Process)-[c1:CONNECTED_TO]->()<-[c2:CONNECTED_TO]-(p2:Process)    with sum(c1.sent_bytes+c2.sent_bytes)/1048576  as xd,p1,p2,c1,c2 match px=(p1)-[c1]->()<-[c2]-(p2) with sum(xd) as sumatorio,p1,p2,c1,c2 match pn=(p1)-[c1]->()<-[c2]-(p2) where sumatorio <> 0  return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio"
+      "match p=(p1)-[n:NoSocket2]-(p2) return p"
   };
 
   var viz = await new NeoVis.default(config);
@@ -211,7 +267,6 @@ async function draw(view) {
 }
 function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
   var conditions;
-  console.log("...."+orderBy)
   if (size == undefined) {
     size="cputime"
   }
@@ -235,20 +290,21 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
   
   
   var config = {
-    container_id: "viz",
-    server_url: "bolt://localhost:7687",
-    server_user: "snow",
-    server_password: "snow123",
+     container_id: "viz",
+    server_url: "neo4j://127.0.0.1:7687",
+    server_user: "neo4j",
+    server_password: "123456",
     labels: {
       Process: {
         caption: "cmd",
         size: size,
         community: "host",
         clickEvent:properties =>{
-            if(properties.properties.fake!=undefined){
-              view.show(cmd)
-              view.choosenNode=properties.properties.cmd
-              view.fill(properties.properties)
+            if(properties.properties.fake==undefined){
+              console.log("here 2")
+              op.show()
+              op.choosenNode=properties.properties.cmd
+              op.fill(properties.properties)
           }
 
         }
@@ -261,9 +317,9 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
       }
     },
     initial_cypher:
-      "match p=(p1:Process)-[c1:CONNECTED_TO]->()<-[c2:CONNECTED_TO]-(p2:Process)    with sum(c1.sent_bytes+c2.sent_bytes)/1048576  as xd,p1,p2,c1,c2 match px=(p1)-[c1]->()<-[c2]-(p2) with sum(xd) as sumatorio,p1,p2,c1,c2 match pn=(p1)-[c1]->()<-[c2]-(p2) where sumatorio <> 0 and " +
+      "match p=(p1)-[n:NoSocket2]-(p2) where " +
       conditions +
-      " return pn,p1.cmd,p2.cmd,p1.host,p2.host,sumatorio,p1.rss,p2.rss"
+      " return p"
   };
   var viz = new NeoVis.default(config);
   var array = getArray()
@@ -300,6 +356,11 @@ export default class NeoVisComponent extends Vue {
   process1="0";
   process2="0";
   choosenNode=null;
+  type="teste";
+  name="teste";
+  replicas=0;
+  originalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
+  finalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
   information={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null}
   
   reDraw() {
@@ -310,7 +371,6 @@ export default class NeoVisComponent extends Vue {
   }
   nodes(arr){
     
-    
     for(let key in arr){
       if(!this.labels.includes(arr[key].label)  && arr[key].label!="Socket" && arr[key].label!=undefined && arr[key].originalProperties.fake!="true" ){
         this.labels.push(arr[key].label)
@@ -318,10 +378,108 @@ export default class NeoVisComponent extends Vue {
     }
     
   }
-  show(){
+  async  show(cont){
+    var arr = cont.split('/')
+    var temp= arr[2]
+    temp=temp.substr(3)
+    var pods;
+    var type;
+    var name;
+   
+    await this.$http.get('http://localhost:3003/pods').then(response => 
+    (
+     
+     pods=response.data[0].items
+   ))
+    for(let i=0;i<pods.length;i++){
+     
+      if(pods[i].metadata.uid==temp){
+        console.log("inside")
+        this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
+        this.name= pods[i].metadata.ownerReferences[0].name
+        break;
+      }
+   }
+    if(this.type=="replicaset"){
+      console.log("wow ehere")
+     var deploymentName;
+        await this.$http.get('http://localhost:3003/replicaset/'+this.name).then(response => 
+        (
+          this.name= response.data.metadata.ownerReferences[0].name
+        ))
+        this.type="deployment"
+        
+    }
+    console.log('hiii http://localhost:3003/'+this.type+'/'+this.name)
+    await this.$http.get('http://localhost:3003/'+this.type+'/'+this.name).then(response => 
+      {
+        this.finalInformation.replicas=response.data.spec.replicas
+        this.finalInformation.limitcpu=response.data.spec.template.spec.containers[0].resources.limits.cpu
+        this.finalInformation.limitmemory=response.data.spec.template.spec.containers[0].resources.limits.memory
+        this.finalInformation.requestcpu=response.data.spec.template.spec.containers[0].resources.requests.cpu
+        this.finalInformation.requestmemory=response.data.spec.template.spec.containers[0].resources.requests.memory
+      })
+    console.log("finsihing0101")
+    this.originalInformation.replicas=this.finalInformation.replicas
+    this.originalInformation.limitcpu=this.finalInformation.limitcpu
+    this.originalInformation.limitmemory=this.finalInformation.limitmemory
+
     this.modalShow=true
  }
 
+  async updateAll(){
+    if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
+    if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
+    if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
+    if(this.originalInformation.requestcpu!=this.finalInformation.requestcpu) await this.updateRequestCpu()
+    if(this.originalInformation.requestmemory!=this.finalInformation.requestmemory) await this.updateRequestMemory()
+      
+    
+  }
+ async updateReplicas(){
+
+      this.$http.post('http://localhost:3003/'+this.type+'/replicas/'+this.name+'/'+this.finalInformation.replicas).then(response => 
+    (
+      console.log(response)
+   ))
+ }
+ async updateLimitCpu(){
+    console.log("isnide cpu")
+    console.log('http://localhost:3003/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu)
+
+      this.$http.post('http://localhost:3003/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu).then(response => 
+    (
+      console.log("tag"+response)
+   ))
+    
+  }
+  async updateLimitMemory(){
+    
+      this.$http.post('http://localhost:3003/'+this.type+'/resources/limits/memory/'+this.name+'/'+this.finalInformation.limitmemory).then(response => 
+    (
+      console.log(response)
+   ))
+    
+  }
+
+   async updateRequestCpu(){
+    console.log("isnide cpu")
+
+      this.$http.post('http://localhost:3003/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu).then(response => 
+    (
+      console.log("tag"+response)
+   ))
+    
+  }
+  async updateRequestMemory(){
+    
+      this.$http.post('http://localhost:3003/'+this.type+'/resources/requests/memory/'+this.name+'/'+this.finalInformation.requestmemory).then(response => 
+    (
+      console.log(response)
+   ))
+    
+  }
+   
   async fill(information){
     this.information.cmd=information.cmd
     this.information.host=information.host
