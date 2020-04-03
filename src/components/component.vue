@@ -433,7 +433,8 @@ export default class NeoVisComponent extends Vue {
     this.originalInformation.replicas=this.finalInformation.replicas
     this.originalInformation.limitcpu=this.finalInformation.limitcpu
     this.originalInformation.limitmemory=this.finalInformation.limitmemory
-
+    this.originalInformation.requestcpu=this.finalInformation.requestcpu
+    this.originalInformation.requestmemory=this.finalInformation.requestmemory
     this.modalShow=true
  }
 
@@ -454,7 +455,9 @@ export default class NeoVisComponent extends Vue {
       console.log("inside m8ss"+JSON.stringify(response))
       this.estado=response.data
       
+      
     })
+    console.log("estado"+this.estado)
   }
  async updateReplicas(){
     console.log("replicando")
@@ -463,11 +466,12 @@ export default class NeoVisComponent extends Vue {
       console.log(response)
    ))
    this.estado="1"
-   while(this.estado!="4"){
-     setInterval(this.getState(), 10000);
-     console.log("in while")
-     
+   while(this.estado!=4){
+     console.log("while")
+     setInterval(getState,300000)
+    console.log(this.estado)
    }
+   
    
    
  }
