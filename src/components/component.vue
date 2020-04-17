@@ -67,17 +67,18 @@
                 </b-card>
             </div>
           <div class="col-md-8">
-            <div id="viz" class="row" ></div>
+            <div id="viz"></div>
             <p></p>
-            <div>  <b-progress :max="max" height="2rem">
+            <div>  <b-progress :max="maximo" height="2rem">
                       <b-progress-bar :value="valor">
-                        Estado - {{estado}}: <strong>{{ valor.toFixed(2) }} / {{ maximo }}</strong>
+                        Estado - {{estado.msg}}: <strong>{{ valor.toFixed(2) }} / {{ maximo }}</strong>
                       </b-progress-bar>
                     </b-progress>
             </div>
           </div>
         </div>
    </div>
+  
     <b-modal size="huge" v-model="modalShow" :title="choosenNode">
       <div>
         <b-card no-body>
@@ -365,9 +366,9 @@ export default class NeoVisComponent extends Vue {
   choosenNode=null;
   type="teste";
   name="teste";
-  estado="inexistente"
+  estado={id:"0",msg:""}
   maximo=100;
-  valor=10;
+  valor=0;
   replicas=0;
   originalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
   finalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
@@ -411,7 +412,6 @@ export default class NeoVisComponent extends Vue {
       }
    }
     if(this.type=="replicaset"){
-      console.log("wow ehere")
      var deploymentName;
         await this.$http.get('http://localhost:3000/replicaset/'+this.name).then(response => 
         (
@@ -420,6 +420,7 @@ export default class NeoVisComponent extends Vue {
         this.type="deployment"
         
     }
+   
     console.log('hiii http://localhost:3000/'+this.type+'/'+this.name)
     await this.$http.get('http://localhost:3000/'+this.type+'/'+this.name).then(response => 
       {
@@ -429,7 +430,6 @@ export default class NeoVisComponent extends Vue {
         this.finalInformation.requestcpu=response.data.spec.template.spec.containers[0].resources.requests.cpu
         this.finalInformation.requestmemory=response.data.spec.template.spec.containers[0].resources.requests.memory
       })
-    console.log("finsihing0101")
     this.originalInformation.replicas=this.finalInformation.replicas
     this.originalInformation.limitcpu=this.finalInformation.limitcpu
     this.originalInformation.limitmemory=this.finalInformation.limitmemory
@@ -444,46 +444,68 @@ export default class NeoVisComponent extends Vue {
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
     if(this.originalInformation.requestcpu!=this.finalInformation.requestcpu) await this.updateRequestCpu()
     if(this.originalInformation.requestmemory!=this.finalInformation.requestmemory) await this.updateRequestMemory()
-      
+
     
+  }
+
+  async updateValue(state){
+    console.log("lll"+state)
+    if(state.id=="1"){this.valor=25}
+    else if(state.id=="2"){this.valor=50}
+    else if(state.id=="3"){this.valor=75}
+    else if (state.id=="4"){this.valor=100}
+    else{this.valor=0}
+    this.estado.msg=state.msg
   }
 
   async getState(){
     console.log("getting state")
     this.$http.get('http://localhost:3000/'+this.type+'/state/state').then(response => 
     {
-      console.log("inside m8ss"+JSON.stringify(response))
-      this.estado=response.data
-      
+      this.estado.id=response.data.id
+      this.estado.msg=response.data.msg
       
     })
-    console.log("estado"+this.estado)
+    await this.updateValue(this.estado)
+    console.log("estado"+this.estado.id)
+  }
+
+  async feedback(title,str){
+     this.estado.id = "1"
+    
+    while ( this.estado.id != "4") {
+        await this.delay( 10000 );
+
+        await this.getState()
+    }
+      this.$bvToast.toast( str, {
+          title: title,
+          variant: 'success',
+          solid: true
+      } );
+      this.estado.id=0
+      this.estado.msg="";
   }
  async updateReplicas(){
-    console.log("replicando")
+    
       this.$http.post('http://localhost:3000/'+this.type+'/replicas/'+this.name+'/'+this.finalInformation.replicas).then(response => 
     (
       console.log(response)
    ))
-   this.estado="1"
-   while(this.estado!=4){
-     console.log("while")
-     setInterval(getState,300000)
-    console.log(this.estado)
-   }
-   
-   
-   
- }
+  this.feedback('Número Réplicas','O número de réplicas foi atualizado com sucesso.')
+}
+
+delay ( time ) {
+    return new Promise( resolve => setTimeout( resolve, time ) )
+}
  async updateLimitCpu(){
-    console.log("isnide cpu")
     console.log('http://localhost:3000/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu)
 
       this.$http.post('http://localhost:3000/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu).then(response => 
     (
       console.log("tag"+response)
    ))
-    
+    this.feedback('Limite cpu','O limite de cpu foi atualizado com sucesso.')
   }
   async updateLimitMemory(){
     
@@ -491,16 +513,19 @@ export default class NeoVisComponent extends Vue {
     (
       console.log(response)
    ))
+
+   this.feedback('Limite memória','O limite de memória foi atualizado com sucesso.')
     
   }
 
    async updateRequestCpu(){
-    console.log("isnide cpu")
-
-      this.$http.post('http://localhost:3003/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu).then(response => 
+    console.log("poro cpu")
+  console.log('http://localhost:3003/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu)
+      this.$http.post('http://localhost:3000/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu).then(response => 
     (
       console.log("tag"+response)
    ))
+   this.feedback('Request cpu','O request de cpu foi atualizado com sucesso.')
     
   }
   async updateRequestMemory(){
@@ -509,6 +534,7 @@ export default class NeoVisComponent extends Vue {
     (
       console.log(response)
    ))
+   this.feedback('Request Memory','O request de  memória foi atualizado com sucesso.')
     
   }
    
@@ -521,8 +547,9 @@ export default class NeoVisComponent extends Vue {
     this.information.pid=information.ppid
     this.information.cont=information.cont
   }
+  
   mounted() {
-    draw(this);
+    draw(this); 
   }
 
   

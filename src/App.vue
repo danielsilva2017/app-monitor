@@ -7,9 +7,12 @@
             <b-navbar-brand ><router-link :to="'/'">
                 Monitor
                 <span class="small text-warning font-weight-bold ml-1" >Beta</span>
+                 
             </router-link></b-navbar-brand>
-
             <b-collapse id="nav-collapse" is-nav>
+                <b-navbar-nav class="ml-auto">
+                    <b-button :variant="variant" style="margin-right: 0" v-on:click="update()">{{name}}</b-button>
+                </b-navbar-nav>
             </b-collapse>
                
         </div>
@@ -19,7 +22,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { Component,Vue,Prop } from 'vue-property-decorator'
 import HelloWorld from './components/HelloWorld.vue'
 import NeoVis from './components/component.vue'
@@ -31,9 +34,46 @@ import NeoVis from './components/component.vue'
   }
 })
 export default class App extends Vue {
-  @Prop() private data = ''
-  changeData(data:any){
+  changeData(data){
     this.data=data;
+  }
+  name="Start"
+  assert=false
+  variant="success"
+  update(){
+    this.assert=!this.assert
+    if(this.assert==true){
+      this.name="Stop"
+      this.start()
+    }
+    else{
+      this.name="Start"
+      this.stop()
+    }
+  }
+  start(){
+    this.variant="danger"
+      this.$http.post('http://localhost:3000/monitor/start').then(response => 
+    (
+      console.log(response)
+   ))
+   this.$bvToast.toast( 'Monitorização iniciada', {
+          title: 'Monitorização',
+          variant: 'success',
+          solid: true
+      } );
+  }
+    stop(){
+      this.variant="success"
+      this.$http.post('http://localhost:3000/monitor/stop').then(response => 
+    (
+      console.log(response)
+   ))
+   this.$bvToast.toast( 'Monitorização acabada', {
+          title: 'Monitorização',
+          variant: 'success',
+          solid: true
+      } );
   }
 }
 </script>
