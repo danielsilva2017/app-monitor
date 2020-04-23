@@ -354,6 +354,7 @@ function reDraw() {
 import { Component, Vue, Prop } from "vue-property-decorator";
 import {nodes} from '../assets/nodes.js'
 import {getArray, saveToArray} from '../../public/json'
+import objectPath from 'object-path'
 @Component()
 export default class NeoVisComponent extends Vue {
   modalShow=false;
@@ -389,6 +390,10 @@ export default class NeoVisComponent extends Vue {
     }
     
   }
+
+  verify ( a, b ) { 
+    console.log("inside now")
+    return a != undefined ? a : b }
   async  show(cont){
     var arr = cont.split('/')
     var temp= arr[2]
@@ -413,6 +418,7 @@ export default class NeoVisComponent extends Vue {
    }
     if(this.type=="replicaset"){
      var deploymentName;
+     console.log('sippphttp://localhost:3000/replicaset/'+this.name)
         await this.$http.get('http://localhost:3000/replicaset/'+this.name).then(response => 
         (
           this.name= response.data.metadata.ownerReferences[0].name
@@ -424,11 +430,11 @@ export default class NeoVisComponent extends Vue {
     console.log('hiii http://localhost:3000/'+this.type+'/'+this.name)
     await this.$http.get('http://localhost:3000/'+this.type+'/'+this.name).then(response => 
       {
-        this.finalInformation.replicas=response.data.spec.replicas
-        this.finalInformation.limitcpu=response.data.spec.template.spec.containers[0].resources.limits.cpu
-        this.finalInformation.limitmemory=response.data.spec.template.spec.containers[0].resources.limits.memory
-        this.finalInformation.requestcpu=response.data.spec.template.spec.containers[0].resources.requests.cpu
-        this.finalInformation.requestmemory=response.data.spec.template.spec.containers[0].resources.requests.memory
+        this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
+        this.finalInformation.limitcpu=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.0.resources.limits.cpu' ),0)
+        this.finalInformation.limitmemory=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.0.resources.limits.memory' ),0)
+        this.finalInformation.requestcpu=this.verify(objectPath.get( response.data,'spec.template.spec.containers[0].resources.requests.cpu'),0)
+        this.finalInformation.requestmemory=this.verify(objectPath.get( response.data,'spec.template.spec.containers[0].resources.requests.memory'),0)
       })
     this.originalInformation.replicas=this.finalInformation.replicas
     this.originalInformation.limitcpu=this.finalInformation.limitcpu

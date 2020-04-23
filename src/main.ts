@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import "./assets/scss/argon.scss";
 import axios from 'axios'
+import  objectPath from 'object-path';
 
 // Install BootstrapVue
 Vue.use(BootstrapVue)
