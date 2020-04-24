@@ -351,6 +351,14 @@ function reDraw() {
   drawAgain(c_value, a.value, b.value,d.value,e.value,f);
 }
 
+
+/*
+  This a Vue js Page but has an neovis component that is pure HTMl thats why some functions are duplicated.
+  Imports:
+    @objectPath is used to recursively verify if any part of the json is undefined
+
+
+*/
 import { Component, Vue, Prop } from "vue-property-decorator";
 import {nodes} from '../assets/nodes.js'
 import {getArray, saveToArray} from '../../public/json'
@@ -583,5 +591,8 @@ body {
 
 .form{
    font-size: 40px important!
+}
+.syntax--comment.syntax--block {
+  color: cadetblue;
 }
 </style>
