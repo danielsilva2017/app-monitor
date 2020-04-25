@@ -354,9 +354,10 @@ function reDraw() {
 
 /**
 
-  * This a Vue js Page but has an neovis component that is pure HTMl thats why some functions are duplicated.
+  * This a Vue js Page but has an neovis component which is a pure HTMl neo4j browser visualizer and
+  thats why some functions are duplicated.
   * Imports:
-  * @param {string} objectPath is used to recursively verify if any part of the json is undefined
+  * @param  objectPath is used to recursively verify if any part of the json is undefined
 */
 
 //xd
@@ -366,6 +367,16 @@ import {getArray, saveToArray} from '../../public/json'
 import objectPath from 'object-path'
 @Component()
 export default class NeoVisComponent extends Vue {
+
+  /**
+   * 
+   * Variable Section 
+   * 
+   * 
+   * Some of this variables might be unnecessary but due to the nature of this work which was " explore 
+   * and try to see if it is possible to do rather than have a good workflow"
+   * 
+   */
   modalShow=false;
   information="teste"
   labels =[];
@@ -384,12 +395,23 @@ export default class NeoVisComponent extends Vue {
   finalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
   information={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null}
   
+  /**
+   * 
+   * Function Section
+   * 
+   */
+
+  //Calls the built-in html function named reDraw
   reDraw() {
     reDraw();
   }
+
+  //Calls the built-in html function named drawAgain
   drawAgain(a,b,c){
     drawAgain(a,b,c);
   }
+
+  //Function used to fill the box with the names of the processes (cmd atribute in SYSQUERY)
   nodes(arr){
     
     for(let key in arr){
@@ -400,9 +422,20 @@ export default class NeoVisComponent extends Vue {
     
   }
 
-  verify ( a, b ) { 
-    console.log("inside now"+a)
-    return a != undefined ? a : b }
+
+  /**
+   * 
+   * 
+   * 
+   * Verifies a is undefined or not. If it is return b otherwise returns its value
+   * 
+   * 
+   * @param {string} a object 
+   * @param {Integer} b value returned if a its undefined
+   */
+  verify ( a, b ) { return a != undefined ? a : b }
+
+
   async  show(cont){
     var arr = cont.split('/')
     var temp= arr[2]
@@ -465,8 +498,13 @@ export default class NeoVisComponent extends Vue {
     
   }
 
+  /**
+   * 
+   * Function used to update the value presented in the Progress bar depending on the state
+   * @param {string} state current state 
+   */
+
   async updateValue(state){
-    console.log("lll"+state)
     if(state.id=="1"){this.valor=25}
     else if(state.id=="2"){this.valor=50}
     else if(state.id=="3"){this.valor=75}
@@ -475,16 +513,20 @@ export default class NeoVisComponent extends Vue {
     this.estado.msg=state.msg
   }
 
+  /**
+   * 
+   * This function is called 10 in 10s after a change is made to update the current state in order to 
+   * update the progress and consequently give feedback to the user
+   */
+
   async getState(){
-    console.log("getting state")
     this.$http.get('http://localhost:3000/'+this.type+'/state/state').then(response => 
     {
       this.estado.id=response.data.id
       this.estado.msg=response.data.msg
       
-    })
+    })  
     await this.updateValue(this.estado)
-    console.log("estado"+this.estado.id)
   }
 
   async feedback(title,str){
