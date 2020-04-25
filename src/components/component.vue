@@ -377,6 +377,9 @@ export default class NeoVisComponent extends Vue {
    * and try to see if it is possible to do rather than have a good workflow"
    * 
    */
+
+
+  // function used to show or not the modal
   modalShow=false;
   information="teste"
   labels =[];
@@ -391,8 +394,11 @@ export default class NeoVisComponent extends Vue {
   maximo=100;
   valor=0;
   replicas=0;
+  //pod's atributes  when  we clicked
   originalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
+  //pod's information when we close the modal
   finalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
+  //information passed to the modal 
   information={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null}
   
   /**
@@ -412,6 +418,7 @@ export default class NeoVisComponent extends Vue {
   }
 
   //Function used to fill the box with the names of the processes (cmd atribute in SYSQUERY)
+
   nodes(arr){
     
     for(let key in arr){
@@ -426,16 +433,24 @@ export default class NeoVisComponent extends Vue {
   /**
    * 
    * 
-   * 
    * Verifies a is undefined or not. If it is return b otherwise returns its value
    * 
    * 
    * @param {string} a object 
    * @param {Integer} b value returned if a its undefined
    */
+
   verify ( a, b ) { return a != undefined ? a : b }
 
-
+  /**
+   * 
+   * This function is used to create a correct correlation between the process detected by sysquery and 
+   * pod presented in kubernetes. After the correlation is achieved the information regarding that pod 
+   * is brought and mixed with the information provided by SYSQUERY and modal shows up.
+   * 
+   * @param {string} cont is an atribute of SYSQUERY, one part of it matches a pod in kubernetes
+   * 
+   */
   async  show(cont){
     var arr = cont.split('/')
     var temp= arr[2]
@@ -452,7 +467,6 @@ export default class NeoVisComponent extends Vue {
     for(let i=0;i<pods.length;i++){
      
       if(pods[i].metadata.uid==temp){
-        console.log("inside")
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
         break;
@@ -488,6 +502,14 @@ export default class NeoVisComponent extends Vue {
     this.modalShow=true
  }
 
+ /**
+ * 
+ * Function that verifies which fields were changed. if they were changed it calls the respective function,
+ * that will call the API yaml Changer and change
+ * 
+ */
+
+
   async updateAll(){
     if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
     if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
@@ -502,6 +524,7 @@ export default class NeoVisComponent extends Vue {
    * 
    * Function used to update the value presented in the Progress bar depending on the state
    * @param {string} state current state 
+   * 
    */
 
   async updateValue(state){
@@ -516,7 +539,8 @@ export default class NeoVisComponent extends Vue {
   /**
    * 
    * This function is called 10 in 10s after a change is made to update the current state in order to 
-   * update the progress and consequently give feedback to the user
+   * update the progress and consequently give feedback to the user. 
+   * 
    */
 
   async getState(){
@@ -528,6 +552,13 @@ export default class NeoVisComponent extends Vue {
     })  
     await this.updateValue(this.estado)
   }
+
+  /**
+   * 
+   * This function is responsible to update the progress bar text, call getState() to update the state and 
+   * in the end launches a modal to let the user know the task is over.
+   * 
+   */
 
   async feedback(title,str){
      this.estado.id = "1"
@@ -545,6 +576,24 @@ export default class NeoVisComponent extends Vue {
       this.estado.id=0
       this.estado.msg="";
   }
+
+/**
+* 
+* Function that returns a promisse to timeout the function call for 10s 
+* 
+*/ 
+
+delay ( time ) {
+    return new Promise( resolve => setTimeout( resolve, time ) )
+}
+
+/**
+ * 
+ * Function that calls the api yamlChanger in order to change the number of replicas of one service 
+ * (deployment or statefulsets)
+ * 
+ */
+
  async updateReplicas(){
     
       this.$http.post('http://localhost:3000/'+this.type+'/replicas/'+this.name+'/'+this.finalInformation.replicas).then(response => 
@@ -554,9 +603,14 @@ export default class NeoVisComponent extends Vue {
   this.feedback('Número Réplicas','O número de réplicas foi atualizado com sucesso.')
 }
 
-delay ( time ) {
-    return new Promise( resolve => setTimeout( resolve, time ) )
-}
+
+/**
+ * 
+ * Function that calls the api yamlChanger in order to change the cpu limit of one service 
+ * (deployment or statefulsets)
+ * 
+ */
+
  async updateLimitCpu(){
     console.log('http://localhost:3000/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu)
 
@@ -566,6 +620,13 @@ delay ( time ) {
    ))
     this.feedback('Limite cpu','O limite de cpu foi atualizado com sucesso.')
   }
+
+  /**
+ * 
+ * Function that calls the api yamlChanger in order to change the memory limit of one service 
+ * (deployment or statefulsets)
+ * 
+ */
   async updateLimitMemory(){
     
       this.$http.post('http://localhost:3000/'+this.type+'/resources/limits/memory/'+this.name+'/'+this.finalInformation.limitmemory).then(response => 
@@ -577,7 +638,14 @@ delay ( time ) {
     
   }
 
-   async updateRequestCpu(){
+/**
+ * 
+ * Function that calls the api yamlChanger in order to change the request cpu of one service 
+ * (deployment or statefulsets)
+ * 
+ */
+
+  async updateRequestCpu(){
     console.log("poro cpu")
   console.log('http://localhost:3003/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu)
       this.$http.post('http://localhost:3000/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu).then(response => 
@@ -587,6 +655,14 @@ delay ( time ) {
    this.feedback('Request cpu','O request de cpu foi atualizado com sucesso.')
     
   }
+
+/**
+ * 
+ * Function that calls the api yamlChanger in order to change the request memory of one service 
+ * (deployment or statefulsets)
+ * 
+ */
+
   async updateRequestMemory(){
     
       this.$http.post('http://localhost:3000/'+this.type+'/resources/requests/memory/'+this.name+'/'+this.finalInformation.requestmemory).then(response => 
@@ -596,7 +672,15 @@ delay ( time ) {
    this.feedback('Request Memory','O request de  memória foi atualizado com sucesso.')
     
   }
-   
+  
+  
+  /**
+ * 
+ * Updates the information that will be displayed in modal when the user double clicks in a pod
+ * @param {JSON} information json object that has the data that will be used to update the modal
+ * 
+ */
+
   async fill(information){
     this.information.cmd=information.cmd
     this.information.host=information.host
@@ -607,6 +691,15 @@ delay ( time ) {
     this.information.cont=information.cont
   }
   
+
+  /**
+ * 
+ * Function that is called in the creation of the page.
+ * Atm this function is calling the following functions:
+ *      * draw -  do draw the pod network
+ * 
+ */
+
   mounted() {
     draw(this); 
   }
