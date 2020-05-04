@@ -160,7 +160,10 @@
               </b-card-text>
             </b-tab>
             <b-tab title="Ação">
-              <b-card-text>Tipo : {{type}}
+              <b-card-text>
+                Tipo : {{type}}
+                
+                Nome: {{finalName}}
 
                 <b-form-group>
                       <template v-slot:prepend>
@@ -390,6 +393,7 @@ export default class NeoVisComponent extends Vue {
   choosenNode=null;
   type="teste";
   name="teste";
+  finalName="teste"
   estado={id:"0",msg:""}
   maximo=100;
   valor=0;
@@ -453,7 +457,14 @@ export default class NeoVisComponent extends Vue {
    */
   async  show(cont){
     var arr = cont.split('/')
-    var temp= arr[2]
+    var temp;
+    if(arr.length==4){
+      temp= arr[2]
+    }else{
+      temp= arr[1]
+    }
+    console.log("response"+temp)
+     
     temp=temp.substr(3)
     var pods;
     var type;
@@ -486,7 +497,7 @@ export default class NeoVisComponent extends Vue {
     console.log('hiii http://localhost:3000/'+this.type+'/'+this.name)
     await this.$http.get('http://localhost:3000/'+this.type+'/'+this.name).then(response => 
       {
-        console.log(JSON.stringify(response.data))
+        this.finalName=response.data.metadata.name
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
         this.finalInformation.limitcpu=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.0.resources.limits.cpu' ),0)
         this.finalInformation.limitmemory=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.0.resources.limits.memory' ),0)
@@ -556,7 +567,11 @@ export default class NeoVisComponent extends Vue {
   /**
    * 
    * This function is responsible to update the progress bar text, call getState() to update the state and 
-   * in the end launches a modal to let the user know the task is over.
+   * in the end launches a modal to let the user know the task is over with a personalized title and 
+   * message depending on the tasks that was performed
+   * 
+   * @param {string} titulo é o titulo que aperece no modal
+   * @param {string} str mensagem que aparece no modal
    * 
    */
 
