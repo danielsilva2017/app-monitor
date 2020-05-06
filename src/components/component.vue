@@ -583,13 +583,15 @@ export default class NeoVisComponent extends Vue {
 
         await this.getState()
     }
-      this.$bvToast.toast( str, {
-          title: title,
-          variant: 'success',
-          solid: true
-      } );
-      this.estado.id=0
-      this.estado.msg="";
+    console.log("completed the cicle")
+    this.$bvToast.toast( str, {
+        title: title,
+        variant: 'success',
+        solid: true
+    } );
+    this.estado.id=0
+    this.estado.msg="";
+    this.updateValue(this.estado)
   }
 
 /**
