@@ -533,7 +533,7 @@ export default class NeoVisComponent extends Vue {
 
   /**
    * 
-   * Function used to update the value presented in the Progress bar depending on the state
+   * Function used to update the value presented in the Progress   depending on the state
    * @param {string} state current state 
    * 
    */

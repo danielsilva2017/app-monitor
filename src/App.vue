@@ -21,14 +21,17 @@
         </div>
     </b-navbar>
     <NeoVis/>
-     <b-modal size="huge" v-model="modalShow" title="Mudar Imagem">
-       <b-card no-body>
+     <b-modal size="huge" v-model="modalShow" title="Acrescentar Imagem">
           <b-form-group>
               <template v-slot:prepend>
                   <b-input-group-text>
                   </b-input-group-text>
               </template>
-              <b-card-sub-title class="mb-2">Keyword</b-card-sub-title>
+              <b-card-sub-title class="mb-2">Keyword
+                <span class="ml-1" v-b-tooltip.hover title="Palavra que será procurada no atributo cmd do nó">
+                  <b-icon-info></b-icon-info>
+                </span>
+              </b-card-sub-title>
               <b-form-input
                       id="profSituation"
                       v-model="image.keyword"
@@ -40,7 +43,12 @@
                   <b-input-group-text>
                   </b-input-group-text>
               </template>
-              <b-card-sub-title class="mb-2">Url</b-card-sub-title>
+              <b-card-sub-title class="mb-2">Url
+                <span class="ml-1" v-b-tooltip.hover title="Url da imagem que vai ser carregado para cada nó que contenha a keyword definida">
+                  <b-icon-info></b-icon-info>
+                </span>
+              </b-card-sub-title>
+              
               <b-form-input
                       id="profSituation"
                       v-model="image.url"
@@ -48,12 +56,12 @@
                       trim
                       >
               </b-form-input>
+              
           </b-form-group>
-        </b-card>  
          <template v-slot:modal-footer="{ cancel, ok }">
             <b-button variant="outline-secondary" v-on:click="cancel()">Cancelar</b-button>
             <span class="flex-fill"></span>
-            <b-button variant="warning" v-on:click="images();ok()">Gravar</b-button>
+            <b-button variant="warning" v-on:click="images();ok()">Acrescentar</b-button>
      </template>
     </b-modal>
   </div>
