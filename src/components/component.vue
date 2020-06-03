@@ -171,15 +171,25 @@
                           </b-input-group-text>
                       </template>
                       <p></p>
-                      <b-card-sub-title class="mb-2">Réplicas</b-card-sub-title>
+                      <b-card-sub-title class="mb-2">
+                        Número de Réplicas
+                        <span class="ml-1" v-b-tooltip.hover title="A alteração deste número pode levar a sob ou sobrecargas da orquestração">
+                          <b-icon-info></b-icon-info>
+                        </span>
+                      </b-card-sub-title>
                       <b-form-input
-                              id="replicas  "
+                              id="replicas"
                               :placeholder="replicas"
                               v-model="finalInformation.replicas"
                               trim>
                       </b-form-input>
                       <p></p>
-                       <b-card-sub-title class="mb-2">Limite de  CPU</b-card-sub-title>
+                      <b-card-sub-title class="mb-2">
+                        Limite de Cpu
+                        <span class="ml-1" v-b-tooltip.hover title="Este número deve ser sempre maior ou igual ao request cpu e deve ter em conta a orquestração podendo levar a falhas ">
+                          <b-icon-info></b-icon-info>
+                        </span>
+                      </b-card-sub-title>
                       <b-form-input
                               id="replicas "
                               :placeholder="replicas"
@@ -187,7 +197,12 @@
                               trim>
                       </b-form-input>
                       <p></p>
-                       <b-card-sub-title class="mb-2">Limite de Memória </b-card-sub-title>
+                      <b-card-sub-title class="mb-2">
+                        Limite de Memória
+                        <span class="ml-1" v-b-tooltip.hover title="Este número deve ser sempre maior ou igual ao request memory e deve ter em conta a orquestração podendo levar a falhas ">
+                          <b-icon-info></b-icon-info>
+                        </span>
+                      </b-card-sub-title>
                       <b-form-input
                               id="replicas  "
                               :placeholder="replicas"
@@ -195,7 +210,12 @@
                               trim>
                       </b-form-input>
                       <p></p>
-                       <b-card-sub-title class="mb-2">Request CPU</b-card-sub-title>
+                      <b-card-sub-title class="mb-2">
+                        Request CPU
+                        <span class="ml-1" v-b-tooltip.hover title="Este número deve ser sempre menor ou igual ao limite de cpu">
+                          <b-icon-info></b-icon-info>
+                        </span>
+                      </b-card-sub-title>
                       <b-form-input
                               id="replicas "
                               :placeholder="replicas"
@@ -203,9 +223,14 @@
                               trim>
                       </b-form-input>
                       <p></p>
-                       <b-card-sub-title class="mb-2">Request Memory</b-card-sub-title>
+                      <b-card-sub-title class="mb-2">
+                        Request Memory
+                        <span class="ml-1" v-b-tooltip.hover title="Este número deve ser sempre menor ou igual ao limite de memória">
+                          <b-icon-info></b-icon-info>
+                        </span>
+                      </b-card-sub-title>
                       <b-form-input
-                              id="replicas  "
+                              id="replicas"
                               :placeholder="replicas"
                               v-model="finalInformation.requestmemory"
                               trim>
