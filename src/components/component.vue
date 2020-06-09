@@ -295,7 +295,7 @@ async function draw(view) {
   viz.registerOnEvent( 'completed', () => {
     view.nodes(viz._nodes)
 } );
-  
+  console.log("here"+config.initial_cypher)
   var array = getArray()
   await viz.render(array,"normal");
   console.log("final")
@@ -347,9 +347,9 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
       }
     },
     relationships: {
-      CONNECTED_TO: {
+       NoSocket2: {
         caption: false,
-        thickness: "sent_bytes"
+        thickness: "finish"
       }
     },
     initial_cypher:
@@ -357,6 +357,7 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
       conditions +
       " return p"
   };
+  console.log("here"+config.initial_cypher+orderBy)
   var viz = new NeoVis.default(config);
   var array = getArray()
  viz.render(array,orderBy);
