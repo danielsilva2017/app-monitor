@@ -331,7 +331,7 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
     server_user: "neo4j",
     server_password: "123456",
     labels: {
-      "Process": {
+      Process: {
         caption: "cmd",
         size: size,
         community: "host",
