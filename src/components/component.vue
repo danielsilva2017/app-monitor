@@ -430,6 +430,8 @@ export default class NeoVisComponent extends Vue {
   finalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
   //information passed to the modal 
   information={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null}
+  //namespace
+  namespace="teste"
   
   /**
    * 
@@ -482,16 +484,16 @@ export default class NeoVisComponent extends Vue {
    * 
    */
   async  show(cont){
-    var arr = cont.split('/')
+   /* var arr = cont.split('/')
     var temp;
     if(arr.length==4){
       temp= arr[2]
     }else{
       temp= arr[1]
     }
-    console.log("response"+temp)
+    console.log("response"+temp)*/
      
-    temp=temp.substr(3)
+    var temp=cont
     var pods;
     var type;
     var name;
@@ -506,13 +508,15 @@ export default class NeoVisComponent extends Vue {
       if(pods[i].metadata.uid==temp){
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
+        this.namespace=pods[i].metadata.namespace;
         break;
       }
    }
+   console.log("UAAAA"+this.namespace)
     if(this.type=="replicaset"){
      var deploymentName;
-     console.log('sippphttp://localhost:3000/replicaset/'+this.name)
-        await this.$http.get('http://localhost:3000/replicaset/'+this.name).then(response => 
+     console.log('sippphttp://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace)
+        await this.$http.get('http://localhost:3000/replicaset/'+this.name+"/"+this.namespace).then(response => 
         (
           this.name= response.data.metadata.ownerReferences[0].name
         ))
@@ -521,7 +525,7 @@ export default class NeoVisComponent extends Vue {
     }
    
     console.log('hiii http://localhost:3000/'+this.type+'/'+this.name)
-    await this.$http.get('http://localhost:3000/'+this.type+'/'+this.name).then(response => 
+    await this.$http.get('http://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
         this.finalName=response.data.metadata.name
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
@@ -581,7 +585,7 @@ export default class NeoVisComponent extends Vue {
    */
 
   async getState(){
-    this.$http.get('http://localhost:3000/'+this.type+'/state/state').then(response => 
+    this.$http.get('http://localhost:3000/'+this.type+'/state/state/state').then(response => 
     {
       this.estado.id=response.data.id
       this.estado.msg=response.data.msg
@@ -639,7 +643,7 @@ delay ( time ) {
 
  async updateReplicas(){
     
-      this.$http.post('http://localhost:3000/'+this.type+'/replicas/'+this.name+'/'+this.finalInformation.replicas).then(response => 
+      this.$http.post('http://localhost:3000/'+this.type+'/replicas/'+this.namespace+'/'+this.name+'/'+this.finalInformation.replicas).then(response => 
     (
       console.log(response)
    ))
@@ -657,7 +661,7 @@ delay ( time ) {
  async updateLimitCpu(){
     console.log('http://localhost:3000/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu)
 
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu).then(response => 
+      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu).then(response => 
     (
       console.log("tag"+response)
    ))
@@ -672,7 +676,7 @@ delay ( time ) {
  */
   async updateLimitMemory(){
     
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/limits/memory/'+this.name+'/'+this.finalInformation.limitmemory).then(response => 
+      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/limits/memory/'+this.name+'/'+this.finalInformation.limitmemory).then(response => 
     (
       console.log(response)
    ))
@@ -691,7 +695,7 @@ delay ( time ) {
   async updateRequestCpu(){
     console.log("poro cpu")
   console.log('http://localhost:3003/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu)
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu).then(response => 
+      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu).then(response => 
     (
       console.log("tag"+response)
    ))
@@ -708,7 +712,7 @@ delay ( time ) {
 
   async updateRequestMemory(){
     
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/requests/memory/'+this.name+'/'+this.finalInformation.requestmemory).then(response => 
+      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/requests/memory/'+this.name+'/'+this.finalInformation.requestmemory).then(response => 
     (
       console.log(response)
    ))

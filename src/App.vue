@@ -4,11 +4,13 @@
     <b-navbar toggleable="lg">
         <div class="container">
 
-            <b-navbar-brand ><router-link :to="'/'">
+            <b-navbar-brand >
                 Monitor
                 <span class="small text-warning font-weight-bold ml-1" >Beta</span>
                  
-            </router-link></b-navbar-brand>
+            </b-navbar-brand>
+            
+            
             
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav class="ml-auto">
@@ -20,7 +22,35 @@
                
         </div>
     </b-navbar>
-    <NeoVis/>
+
+<div class="nav-wrapper container">
+    <ul class="nav nav-pills nav-fill flex-column flex-md-row" id="tabs-icons-text" role="tablist">
+        <li class="nav-item">
+            <a :class="'nav-link mb-sm-3 mb-md-0 ' + ( currentpage == 1 ? 'active' : '' ) " id="tabs-icons-text-1-tab" data-toggle="tab" href="#tabs-icons-text-1" role="tab" aria-controls="tabs-icons-text-1" aria-selected="true" @click="currentpage=1">Processos</a>
+        </li>
+        <li class="nav-item">
+            <a :class="'nav-link mb-sm-3 mb-md-0 ' + ( currentpage == 2 ? 'active' : '' )" id="tabs-icons-text-2-tab" data-toggle="tab" href="#tabs-icons-text-2" role="tab" aria-controls="tabs-icons-text-2" aria-selected="false" @click="currentpage=2">Pods</a>
+        </li>
+        <li class="nav-item">
+            <a :class="'nav-link mb-sm-3 mb-md-0 ' + ( currentpage == 3 ? 'active' : '' )" id="tabs-icons-text-3-tab" data-toggle="tab" href="#tabs-icons-text-3" role="tab" aria-controls="tabs-icons-text-3" aria-selected="false" @click="currentpage=3">Hosts</a>
+        </li>
+    </ul>
+</div>
+<div class="card shadow container ">
+    <div class="card-body">
+        <div class="tab-content" id="myTabContent">
+            <div :class="'tab-pane fade '+ (currentpage==1 ? 'show active': '') " id="tabs-icons-text-1" role="tabpanel" aria-labelledby="tabs-icons-text-1-tab">
+                <NeoVis/>
+            </div>
+            <div :class="'tab-pane fade '+ (currentpage==2 ? 'show active': '') " role="tabpanel" aria-labelledby="tabs-icons-text-2-tab">
+                <Pods/>
+            </div>
+            <div :class="'tab-pane fade '+ (currentpage==3 ? 'show active': '') " role="tabpanel" aria-labelledby="tabs-icons-text-3-tab">
+                <Hosts/>
+            </div>
+        </div>
+    </div>
+  </div>
      <b-modal size="huge" v-model="modalShow" title="Acrescentar Imagem">
           <b-form-group>
               <template v-slot:prepend>
@@ -71,17 +101,22 @@
 import { Component,Vue,Prop } from 'vue-property-decorator'
 import HelloWorld from './components/HelloWorld.vue'
 import NeoVis from './components/component.vue'
+import Pods from './components/pods.vue'
+import Hosts from './components/hosts.vue'
 
 @Component({
   components: {
-    HelloWorld,
-    NeoVis
+    NeoVis,
+    Pods,
+    Hosts
+
   }
 })
 export default class App extends Vue {
   changeData(data){
     this.data=data;
   }
+  currentpage=1
   modalShow=false
   name="Start"
   assert=false
