@@ -268,11 +268,8 @@ async function draw(view) {
         size: "cputime",
         community: "host",
         clickEvent: properties => {
-          console.log("op")
           var cmd = properties.properties
           if(properties.properties.fake==undefined){
-            console.log("here")
-            
              view.show(properties.properties.cont)
             view.choosenNode=properties.properties.cmd
             view.fill(properties.properties)
@@ -283,7 +280,7 @@ async function draw(view) {
     relationships: {
       NoSocket2: {
         caption: false,
-        thickness: "finish"
+        thickness: "sent_bytes"
       }
     },
 
@@ -295,11 +292,8 @@ async function draw(view) {
   viz.registerOnEvent( 'completed', () => {
     view.nodes(viz._nodes)
 } );
-  console.log("here"+config.initial_cypher)
   var array = getArray()
-  await viz.render(array,"normal");
-  console.log("final")
-
+  await viz.render(array,"normal","viz");
 }
 function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
   var conditions;
@@ -337,7 +331,6 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
         community: "host",
         clickEvent:properties =>{
             if(properties.properties.fake==undefined){
-              console.log("here 2")
               op.show(properties.properties.cont)
               op.choosenNode=properties.properties.cmd
               op.fill(properties.properties)
@@ -357,10 +350,9 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
       conditions +
       " return p"
   };
-  console.log("here"+config.initial_cypher+orderBy)
   var viz = new NeoVis.default(config);
   var array = getArray()
- viz.render(array,orderBy);
+ viz.render(array,orderBy,"viz");
 }
 function reDraw() {
   var a = document.getElementById("instance1");
@@ -484,14 +476,6 @@ export default class NeoVisComponent extends Vue {
    * 
    */
   async  show(cont){
-   /* var arr = cont.split('/')
-    var temp;
-    if(arr.length==4){
-      temp= arr[2]
-    }else{
-      temp= arr[1]
-    }
-    console.log("response"+temp)*/
      
     var temp=cont
     var pods;
@@ -512,10 +496,8 @@ export default class NeoVisComponent extends Vue {
         break;
       }
    }
-   console.log("UAAAA"+this.namespace)
     if(this.type=="replicaset"){
      var deploymentName;
-     console.log('sippphttp://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace)
         await this.$http.get('http://localhost:3000/replicaset/'+this.name+"/"+this.namespace).then(response => 
         (
           this.name= response.data.metadata.ownerReferences[0].name
@@ -523,8 +505,6 @@ export default class NeoVisComponent extends Vue {
         this.type="deployment"
         
     }
-   
-    console.log('hiii http://localhost:3000/'+this.type+'/'+this.name)
     await this.$http.get('http://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
         this.finalName=response.data.metadata.name
@@ -557,7 +537,7 @@ export default class NeoVisComponent extends Vue {
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
     if(this.originalInformation.requestcpu!=this.finalInformation.requestcpu) await this.updateRequestCpu()
     if(this.originalInformation.requestmemory!=this.finalInformation.requestmemory) await this.updateRequestMemory()
-
+    
     
   }
 
@@ -613,7 +593,6 @@ export default class NeoVisComponent extends Vue {
 
         await this.getState()
     }
-    console.log("completed the cicle")
     this.$bvToast.toast( str, {
         title: title,
         variant: 'success',
@@ -659,7 +638,6 @@ delay ( time ) {
  */
 
  async updateLimitCpu(){
-    console.log('http://localhost:3000/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu)
 
       this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu).then(response => 
     (
