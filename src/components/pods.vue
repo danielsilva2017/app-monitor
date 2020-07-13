@@ -55,13 +55,7 @@
             </div>
             <div class="col-md-8">
                 <div id="vizp"></div>
-                <p></p>
-            <div>  <b-progress :max="maximo" height="2rem">
-                      <b-progress-bar :value="valor">
-                        Estado - {{estado.msg}}: <strong>{{ valor.toFixed(2) }} / {{ maximo }}</strong>
-                      </b-progress-bar>
-                    </b-progress>
-            </div>
+                
             </div>
            
         </div>
@@ -69,10 +63,18 @@
 
 </template>
 
-<script>
+<script lang="ts">
+
+
+//Imports
+import { Component, Vue, Prop } from "vue-property-decorator";
+import objectPath from 'object-path'
+import axios from 'axios';
+import NeoVis from '../../public/neovis.js';
+import  Array  from '../../public/json2';
 //Render scripts
 var op;
-async function draw(view) {
+async function draw(view:any) {
   console.log("poderino")
   op=view
   var config = {
@@ -83,7 +85,7 @@ async function draw(view) {
     labels: {
       Pod: {
         caption:"cont",
-        clickEvent: properties => {
+        clickEvent: (properties:any) => {
           console.log("Lol")
           view.show(properties.properties.cont)
         }
@@ -100,21 +102,19 @@ async function draw(view) {
       "MATCH p=(p1)-[r:Pod]->(p2) RETURN p "
   };
 
-  var viz =  new NeoVis.default(config);
-  var array = getArray()
+  var viz =  new NeoVis(config);
+  var b = new Array;
+  var array = b.getArray()
   console.log("hereee")
   viz.render(array,"normal","vizp");
 
 }
 
 
-//Imports
-import { Component, Vue, Prop } from "vue-property-decorator";
-import {nodes} from '../assets/nodes.js'
-import {getArray, saveToArray} from '../../public/json'
-import objectPath from 'object-path'
-@Component()
+@Component({})
 export default class HostsComponent extends Vue {
+  @Prop({ type: String })
+    public  photo : string="";
  //pod's atributes  when  we clicked
   originalInformation={podId:null,podName:null,replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
   //pod's information when we close the modal
@@ -122,6 +122,8 @@ export default class HostsComponent extends Vue {
   modalShow=false;
   choosenTitle="";
   type="";
+  name="";
+  namespace=""
   estado={id:"0",msg:""}
   maximo=100;
   valor=0;
@@ -132,16 +134,15 @@ export default class HostsComponent extends Vue {
       if(this.isEditing==true){
           this.isEditing=!this.isEditing
           this.updateAll()
-          this.button="Gravar"
+          this.button="Editar"
       }else{
           this.isEditing=!this.isEditing
-          this.button="Editar"
+          this.button="Gravar"
       }
       
       
   }
-  async  show(cont){
-      this.choosenNode=cont
+  async  show(cont:any){
    /* var arr = cont.split('/')
     var temp;
     if(arr.length==4){
@@ -153,21 +154,23 @@ export default class HostsComponent extends Vue {
     console.log("conting "+cont)
     this.originalInformation.podId=cont
     var temp=cont
-    var pods;
-    var type;
-    var name;
-   
-    await this.$http.get('http://localhost:3000/pods').then(response => 
-    (
+    var pods:any;
+    var type:any;
+    var name:any;
+    console.log("almost")
+    await axios.get('http://localhost:3000/pods').then(response => 
+    {
      
      pods=response.data[0].items
-   ))
+     console.log("inside");
+    })
     for(let i=0;i<pods.length;i++){
      
       if(pods[i].metadata.uid==temp){
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
         this.namespace=pods[i].metadata.namespace;
+        
         break;
       }
    }
@@ -175,7 +178,7 @@ export default class HostsComponent extends Vue {
     if(this.type=="replicaset"){
      var deploymentName;
      console.log('sippphttp://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace)
-        await this.$http.get('http://localhost:3000/replicaset/'+this.name+"/"+this.namespace).then(response => 
+        await axios.get('http://localhost:3000/replicaset/'+this.name+"/"+this.namespace).then(response => 
         (
           this.name= response.data.metadata.ownerReferences[0].name
         ))
@@ -184,7 +187,7 @@ export default class HostsComponent extends Vue {
     }
    
     console.log('hiii http://localhost:3000/'+this.type+'/'+this.name)
-    await this.$http.get('http://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
+    await axios.get('http://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
         this.originalInformation.podName=response.data.metadata.name
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
@@ -202,8 +205,9 @@ export default class HostsComponent extends Vue {
     
  }
 
- verify ( a, b ) { return a != undefined ? a : b }
+ verify ( a:any, b:any) { return a != undefined ? a : b }
   async updateAll(){
+    console.log("here"+this.originalInformation.replicas+"  "+this.finalInformation.replicas)
     if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
     if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
@@ -220,7 +224,7 @@ export default class HostsComponent extends Vue {
    * 
    */
 
-  async updateValue(state){
+  async updateValue(state:any){
     if(state.id=="1"){this.valor=25}
     else if(state.id=="2"){this.valor=50}
     else if(state.id=="3"){this.valor=75}
@@ -237,7 +241,7 @@ export default class HostsComponent extends Vue {
    */
 
   async getState(){
-    this.$http.get('http://localhost:3000/'+this.type+'/state/state/state').then(response => 
+    axios.get('http://localhost:3000/'+this.type+'/state/state/state').then(response => 
     {
       this.estado.id=response.data.id
       this.estado.msg=response.data.msg
@@ -257,7 +261,7 @@ export default class HostsComponent extends Vue {
    * 
    */
 
-  async feedback(title,str){
+  async feedback(title:string,str:string){
      this.estado.id = "1"
     
     while ( this.estado.id != "4") {
@@ -271,7 +275,7 @@ export default class HostsComponent extends Vue {
         variant: 'success',
         solid: true
     } );
-    this.estado.id=0
+    this.estado.id="0"
     this.estado.msg="";
     this.updateValue(this.estado)
   }
@@ -282,7 +286,7 @@ export default class HostsComponent extends Vue {
 * 
 */ 
 
-delay ( time ) {
+delay ( time:number ) {
     return new Promise( resolve => setTimeout( resolve, time ) )
 }
 
@@ -294,12 +298,9 @@ delay ( time ) {
  */
 
  async updateReplicas(){
-    
-      this.$http.post('http://localhost:3000/'+this.type+'/replicas/'+this.namespace+'/'+this.name+'/'+this.finalInformation.replicas).then(response => 
-    (
-      console.log(response)
-   ))
-  this.feedback('Número Réplicas','O número de réplicas foi atualizado com sucesso.')
+     
+  this.$root.$emit('updateReplicas',this.type,this.namespace,this.name,this.finalInformation.replicas)
+  
 }
 
 
@@ -311,13 +312,7 @@ delay ( time ) {
  */
 
  async updateLimitCpu(){
-    console.log('http://localhost:3000/'+this.type+'/resources/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu)
-
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu).then(response => 
-    (
-      console.log("tag"+response)
-   ))
-    this.feedback('Limite cpu','O limite de cpu foi atualizado com sucesso.')
+    this.$root.$emit('updateLimitCpu',this.type,this.namespace,this.name,this.finalInformation.limitcpu)
   }
 
   /**
@@ -328,12 +323,7 @@ delay ( time ) {
  */
   async updateLimitMemory(){
     
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/limits/memory/'+this.name+'/'+this.finalInformation.limitmemory).then(response => 
-    (
-      console.log(response)
-   ))
-
-   this.feedback('Limite memória','O limite de memória foi atualizado com sucesso.')
+      this.$root.$emit('updateLimitMemory',this.type,this.namespace,this.name,this.finalInformation.limitmemory)
     
   }
 
@@ -345,13 +335,7 @@ delay ( time ) {
  */
 
   async updateRequestCpu(){
-    console.log("poro cpu")
-  console.log('http://localhost:3003/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu)
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu).then(response => 
-    (
-      console.log("tag"+response)
-   ))
-   this.feedback('Request cpu','O request de cpu foi atualizado com sucesso.')
+    this.$root.$emit('updateRequestCpu',this.type,this.namespace,this.name,this.finalInformation.requestcpu)
     
   }
 
@@ -363,12 +347,7 @@ delay ( time ) {
  */
 
   async updateRequestMemory(){
-    
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/requests/memory/'+this.name+'/'+this.finalInformation.requestmemory).then(response => 
-    (
-      console.log(response)
-   ))
-   this.feedback('Request Memory','O request de  memória foi atualizado com sucesso.')
+    this.$root.$emit('updateRequestMemory',this.type,this.namespace,this.name,this.finalInformation.requestmemory)
     
   }
   

@@ -19,9 +19,13 @@
                     <b-button :variant="variant" style="margin-right: 0" v-on:click="update()">{{name}}</b-button>
                 </b-navbar-nav>
             </b-collapse>
+            
+            
+
                
         </div>
     </b-navbar>
+    
 
 <div class="nav-wrapper container">
     <ul class="nav nav-pills nav-fill flex-column flex-md-row" id="tabs-icons-text" role="tablist">
@@ -94,7 +98,10 @@
             <b-button variant="warning" v-on:click="images();ok()">Acrescentar</b-button>
      </template>
     </b-modal>
+    <p></p>
+    <Action/>
   </div>
+  
 </template>
 
 <script>
@@ -103,12 +110,14 @@ import HelloWorld from './components/HelloWorld.vue'
 import NeoVis from './components/component.vue'
 import Pods from './components/pods.vue'
 import Hosts from './components/hosts.vue'
+import Action from './components/action.vue'
 
 @Component({
   components: {
     NeoVis,
     Pods,
-    Hosts
+    Hosts,
+    Action
 
   }
 })

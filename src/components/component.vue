@@ -68,13 +68,7 @@
             </div>
           <div class="col-md-8">
             <div id="viz"></div>
-            <p></p>
-            <div>  <b-progress :max="maximo" height="2rem">
-                      <b-progress-bar :value="valor">
-                        Estado - {{estado.msg}}: <strong>{{ valor.toFixed(2) }} / {{ maximo }}</strong>
-                      </b-progress-bar>
-                    </b-progress>
-            </div>
+            
           </div>
         </div>
    </div>
@@ -252,10 +246,13 @@
   </div>
 </div>
 </template>
-<script >
-var op;
+<script lang="ts">
+import axios from 'axios';
+import NeoVis from '../../public/neovis.js';
+import  Array  from '../../public/json2';
+var op:any;
 
-async function draw(view) {
+async function draw(view:any) {
   op=view
   var config = {
     container_id: "viz",
@@ -267,7 +264,7 @@ async function draw(view) {
         caption: "cmd",
         size: "cputime",
         community: "host",
-        clickEvent: properties => {
+        clickEvent: (properties:any) => {
           var cmd = properties.properties
           if(properties.properties.fake==undefined){
              view.show(properties.properties.cont)
@@ -288,18 +285,20 @@ async function draw(view) {
       "match p=(p1)-[n:NoSocket2]-(p2) return p"
   };
 
-  var viz = await new NeoVis.default(config);
+  let viz= await new NeoVis(config);
   viz.registerOnEvent( 'completed', () => {
+    var a;
     view.nodes(viz._nodes)
 } );
   var array = getArray()
   await viz.render(array,"normal","viz");
 }
-function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
+function drawAgain(size:any, instance1:any, instance2:any,process1:any,process2:any,orderBy:any) {
   var conditions;
   if (size == undefined) {
     size="cputime"
   }
+  console.log("1"+size+" 2"+instance1+" i3"+instance2+" 4"+process1+" 5"+process2+" 6"+orderBy)
   
   if (instance1 != "0") {
     conditions = "p1.host contains '" + instance1 + "' ";
@@ -329,7 +328,7 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
         caption: "cmd",
         size: size,
         community: "host",
-        clickEvent:properties =>{
+        clickEvent:(properties:any) =>{
             if(properties.properties.fake==undefined){
               op.show(properties.properties.cont)
               op.choosenNode=properties.properties.cmd
@@ -350,26 +349,34 @@ function drawAgain(size, instance1, instance2,process1,process2,orderBy) {
       conditions +
       " return p"
   };
-  var viz = new NeoVis.default(config);
+  console.log(config.initial_cypher)
+  var viz = new NeoVis(config);
   var array = getArray()
  viz.render(array,orderBy,"viz");
 }
 function reDraw() {
-  var a = document.getElementById("instance1");
-  var b = document.getElementById("instance2");
-  var d = document.getElementById("process1");
-  var e = document.getElementById("process2");
-  var c = document.getElementsByName("neovis");
-  var f =document.querySelector('input[name = orderBy]:checked').value;
-  var c_value;
-  for (var i = 0; i < c.length; i++) {
-    if (c[i].checked) {
+  var a = <HTMLInputElement>document.getElementById("instance1");
+  var b = <HTMLInputElement>document.getElementById("instance2");
+  var d = <HTMLInputElement>document.getElementById("process1");
+  var e = <HTMLInputElement>document.getElementById("process2");
+  var c= document.getElementsByName("neovis") as  NodeListOf<HTMLInputElement>
+  var f= document.getElementsByName("orderBy") as  NodeListOf<HTMLInputElement>
+  var c_value:any; 
+  var f_value:any;
+  for (var i:number = 0; i < c.length; i++) {
+    if (c[i].checked ) {
       c_value = c[i].value;
       break;
     }
   }
+   for (var i:number = 0; i < f.length; i++) {
+    if (f[i].checked ) {
+      f_value = f[i].value;
+      break;
+    }
+  }
 
-  drawAgain(c_value, a.value, b.value,d.value,e.value,f);
+  drawAgain(c_value, a.value, b.value,d.value,e.value,f_value);
 }
 
 
@@ -383,16 +390,15 @@ function reDraw() {
 
 //xd
 import { Component, Vue, Prop } from "vue-property-decorator";
-import {nodes} from '../assets/nodes.js'
-import {getArray, saveToArray} from '../../public/json'
+import {getArray} from '../../public/json'
 import objectPath from 'object-path'
-@Component()
+@Component({})
 export default class NeoVisComponent extends Vue {
 
   /**
    * 
    * Variable Section 
-   * 
+   * string[] 
    * 
    * Some of this variables might be unnecessary but due to the nature of this work which was " explore 
    * and try to see if it is possible to do rather than have a good workflow"
@@ -402,8 +408,7 @@ export default class NeoVisComponent extends Vue {
 
   // function used to show or not the modal
   modalShow=false;
-  information="teste"
-  labels =[];
+  labels:string[]=[];
   instance1="0";
   instance2="0";
   process1="0";
@@ -412,7 +417,7 @@ export default class NeoVisComponent extends Vue {
   type="teste";
   name="teste";
   finalName="teste"
-  estado={id:"0",msg:""}
+  estado:any={id:"0",msg:""}
   maximo=100;
   valor=0;
   replicas=0;
@@ -421,7 +426,7 @@ export default class NeoVisComponent extends Vue {
   //pod's information when we close the modal
   finalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
   //information passed to the modal 
-  information={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null}
+  information:any={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null}
   //namespace
   namespace="teste"
   
@@ -437,16 +442,16 @@ export default class NeoVisComponent extends Vue {
   }
 
   //Calls the built-in html function named drawAgain
-  drawAgain(a,b,c){
-    drawAgain(a,b,c);
+  drawAgain(a:any,b:any,c:any,d:any,e:any,f:any){
+    drawAgain(a,b,c,d,e,f);
   }
 
   //Function used to fill the box with the names of the processes (cmd atribute in SYSQUERY)
 
-  nodes(arr){
+  nodes(arr:any){
     
     for(let key in arr){
-      if(!this.labels.includes(arr[key].label)  && arr[key].label!="Socket" && arr[key].label!=undefined && arr[key].originalProperties.fake!="true" ){
+      if(!this.labels.includes((arr[key] as any).label)  && arr[key].label!="Socket" && arr[key].label!=undefined && arr[key].originalProperties.fake!="true" ){
         this.labels.push(arr[key].label)
       }
     }
@@ -464,7 +469,7 @@ export default class NeoVisComponent extends Vue {
    * @param {Integer} b value returned if a its undefined
    */
 
-  verify ( a, b ) { return a != undefined ? a : b }
+  verify ( a:any, b:any ) { return a != undefined ? a : b }
 
   /**
    * 
@@ -475,14 +480,14 @@ export default class NeoVisComponent extends Vue {
    * @param {string} cont is an atribute of SYSQUERY, one part of it matches a pod in kubernetes
    * 
    */
-  async  show(cont){
+  async  show(cont:any){
      
     var temp=cont
-    var pods;
+    var pods:any;
     var type;
     var name;
    
-    await this.$http.get('http://localhost:3000/pods').then(response => 
+    await axios.get('http://localhost:3000/pods').then(response => 
     (
      
      pods=response.data[0].items
@@ -498,14 +503,14 @@ export default class NeoVisComponent extends Vue {
    }
     if(this.type=="replicaset"){
      var deploymentName;
-        await this.$http.get('http://localhost:3000/replicaset/'+this.name+"/"+this.namespace).then(response => 
+        await axios.get('http://localhost:3000/replicaset/'+this.name+"/"+this.namespace).then(response => 
         (
           this.name= response.data.metadata.ownerReferences[0].name
         ))
         this.type="deployment"
         
     }
-    await this.$http.get('http://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
+    await axios.get('http://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
         this.finalName=response.data.metadata.name
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
@@ -541,92 +546,11 @@ export default class NeoVisComponent extends Vue {
     
   }
 
-  /**
-   * 
-   * Function used to update the value presented in the Progress   depending on the state
-   * @param {string} state current state 
-   * 
-   */
-
-  async updateValue(state){
-    if(state.id=="1"){this.valor=25}
-    else if(state.id=="2"){this.valor=50}
-    else if(state.id=="3"){this.valor=75}
-    else if (state.id=="4"){this.valor=100}
-    else{this.valor=0}
-    this.estado.msg=state.msg
-  }
-
-  /**
-   * 
-   * This function is called 10 in 10s after a change is made to update the current state in order to 
-   * update the progress and consequently give feedback to the user. 
-   * 
-   */
-
-  async getState(){
-    this.$http.get('http://localhost:3000/'+this.type+'/state/state/state').then(response => 
-    {
-      this.estado.id=response.data.id
-      this.estado.msg=response.data.msg
-      
-    })  
-    await this.updateValue(this.estado)
-  }
-
-  /**
-   * 
-   * This function is responsible to update the progress bar text, call getState() to update the state and 
-   * in the end launches a modal to let the user know the task is over with a personalized title and 
-   * message depending on the tasks that was performed
-   * 
-   * @param {string} titulo é o titulo que aperece no modal
-   * @param {string} str mensagem que aparece no modal
-   * 
-   */
-
-  async feedback(title,str){
-     this.estado.id = "1"
-    
-    while ( this.estado.id != "4") {
-        await this.delay( 10000 );
-
-        await this.getState()
-    }
-    this.$bvToast.toast( str, {
-        title: title,
-        variant: 'success',
-        solid: true
-    } );
-    this.estado.id=0
-    this.estado.msg="";
-    this.updateValue(this.estado)
-  }
-
-/**
-* 
-* Function that returns a promisse to timeout the function call for 10s 
-* 
-*/ 
-
-delay ( time ) {
-    return new Promise( resolve => setTimeout( resolve, time ) )
-}
-
-/**
- * 
- * Function that calls the api yamlChanger in order to change the number of replicas of one service 
- * (deployment or statefulsets)
- * 
- */
-
+  
  async updateReplicas(){
-    
-      this.$http.post('http://localhost:3000/'+this.type+'/replicas/'+this.namespace+'/'+this.name+'/'+this.finalInformation.replicas).then(response => 
-    (
-      console.log(response)
-   ))
-  this.feedback('Número Réplicas','O número de réplicas foi atualizado com sucesso.')
+     
+  this.$root.$emit('updateReplicas',this.type,this.namespace,this.name,this.finalInformation.replicas)
+  
 }
 
 
@@ -638,12 +562,7 @@ delay ( time ) {
  */
 
  async updateLimitCpu(){
-
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/limits/cpu/'+this.name+'/'+this.finalInformation.limitcpu).then(response => 
-    (
-      console.log("tag"+response)
-   ))
-    this.feedback('Limite cpu','O limite de cpu foi atualizado com sucesso.')
+    this.$root.$emit('updateLimitCpu',this.type,this.namespace,this.name,this.finalInformation.limitcpu)
   }
 
   /**
@@ -654,12 +573,7 @@ delay ( time ) {
  */
   async updateLimitMemory(){
     
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/limits/memory/'+this.name+'/'+this.finalInformation.limitmemory).then(response => 
-    (
-      console.log(response)
-   ))
-
-   this.feedback('Limite memória','O limite de memória foi atualizado com sucesso.')
+      this.$root.$emit('updateLimitMemory',this.type,this.namespace,this.name,this.finalInformation.limitmemory)
     
   }
 
@@ -671,13 +585,7 @@ delay ( time ) {
  */
 
   async updateRequestCpu(){
-    console.log("poro cpu")
-  console.log('http://localhost:3003/'+this.type+'/resources/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu)
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/requests/cpu/'+this.name+'/'+this.finalInformation.requestcpu).then(response => 
-    (
-      console.log("tag"+response)
-   ))
-   this.feedback('Request cpu','O request de cpu foi atualizado com sucesso.')
+    this.$root.$emit('updateRequestCpu',this.type,this.namespace,this.name,this.finalInformation.requestcpu)
     
   }
 
@@ -689,15 +597,11 @@ delay ( time ) {
  */
 
   async updateRequestMemory(){
-    
-      this.$http.post('http://localhost:3000/'+this.type+'/resources/'+this.namespace+'/requests/memory/'+this.name+'/'+this.finalInformation.requestmemory).then(response => 
-    (
-      console.log(response)
-   ))
-   this.feedback('Request Memory','O request de  memória foi atualizado com sucesso.')
+    this.$root.$emit('updateRequestMemory',this.type,this.namespace,this.name,this.finalInformation.requestmemory)
     
   }
-  
+
+
   
   /**
  * 
@@ -706,7 +610,7 @@ delay ( time ) {
  * 
  */
 
-  async fill(information){
+  async fill(information:any){
     this.information.cmd=information.cmd
     this.information.host=information.host
     this.information.comm=information.comm

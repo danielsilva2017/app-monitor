@@ -4,10 +4,10 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 //Render scripts
 var op;
-async function draw(view) {
+async function draw(view:any) {
   console.log("here drawingg")
   op=view
   var config = {
@@ -20,7 +20,7 @@ async function draw(view) {
         caption:"name",
         size:"3",
         commmunity:"name",
-        clickEvent: properties => {
+        clickEvent: (properties:any) => {
           
         }
       }
@@ -36,7 +36,7 @@ async function draw(view) {
       "MATCH p=(p1)-[r:HostConnections]->(p2) RETURN p "
   };
 
-  var viz =  new NeoVis.default(config);
+  var viz =  new NeoVis(config);
   var array = getArray()
   console.log("hereee")
   viz.render(array,"normal","viza");
@@ -46,10 +46,11 @@ async function draw(view) {
 
 //Imports
 import { Component, Vue, Prop } from "vue-property-decorator";
-import {nodes} from '../assets/nodes.js'
-import {getArray, saveToArray} from '../../public/json'
+import axios from 'axios';
+import NeoVis from '../../public/neovis.js';
+import {getArray} from '../../public/json'
 import objectPath from 'object-path'
-@Component()
+@Component({})
 export default class HostsComponent extends Vue {
 mounted(){
     draw(this)
