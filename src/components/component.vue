@@ -70,171 +70,171 @@
             <div id="viz"></div>
             
           </div>
+          
         </div>
+        <p></p>
+        
    </div>
+   <div class="col-md-12">
+          
+           <b-table small head-variant="light" bordered="bordered" sticky-header hover  :items="pods" :busy="!isBusy" :fields="fields" >
+              <template v-slot:table-busy>
+                <div class="text-center text-danger my-2">
+                  <b-spinner class="align-middle"></b-spinner>
+                  <strong> Loading...</strong>
+                </div>
+              </template>
+            </b-table>
+            
+    </div>
+    <b-button v-on:click="seeMore()">Ver mais</b-button>
+    
+    <b-modal size="huge" v-model="showTable" Title='Tabela'>
+      <b-table small head-variant="light" bordered="bordered" sticky-header hover  :items="pods" :busy="!isBusy" :fields="fields2" >
+              <template v-slot:table-busy>
+                <div class="text-center text-danger my-2">
+                  <b-spinner class="align-middle"></b-spinner>
+                  <strong> Loading...</strong>
+                </div>
+              </template>
+            </b-table>
+    </b-modal>
   
-    <b-modal size="huge" v-model="modalShow" :title="choosenNode">
+    <b-modal size="huge" v-model="modalShow" :title="name">
       <div>
-        <b-card no-body>
-          <b-tabs card>
-            <b-tab title="Informacao" active>
-              <b-card-text>
-                  <b-form-group>
-                      <template v-slot:prepend>
-                          <b-input-group-text>
-                          </b-input-group-text>
-                      </template>
-                      <b-form-input
-                              id="profSituation"
-                              :placeholder="information.comm"
-                              trim
-                              readonly>
-                      </b-form-input>
-                  </b-form-group>
-                  <b-form-group>
-                      <template v-slot:prepend>
-                          <b-input-group-text>
-                          </b-input-group-text>
-                      </template>
-                      <b-form-input
-                              id="profSituation"
-                              :placeholder="information.cmd"
-                              trim
-                              readonly>
-                      </b-form-input>
-                  </b-form-group>
-                  <b-form-group>
-                      <template v-slot:prepend>
-                          <b-input-group-text>
-                          </b-input-group-text>
-                      </template>
-                      <b-form-input
-                              id="profSituation"
-                              :placeholder="information.pid"
-                              trim
-                              readonly>
-                      </b-form-input>
-                  </b-form-group>
-                  <b-form-group>
-                      <template v-slot:prepend>
-                          <b-input-group-text>
-                          </b-input-group-text>
-                      </template>
-                      <b-form-input
-                              id="profSituation"
-                              :placeholder="information.host"
-                              trim
-                              readonly>
-                      </b-form-input>
-                  </b-form-group>
-                   <b-form-group>
-                      <template v-slot:prepend>
-                          <b-input-group-text>
-                          </b-input-group-text>
-                      </template>
-                      <b-form-input
-                              id="profSituation"
-                              :placeholder="information.rss"
-                              trim
-                              readonly>
-                      </b-form-input>
-                  </b-form-group>
-                  <b-form-group>
-                      <template v-slot:prepend>
-                          <b-input-group-text>
-                          </b-input-group-text>
-                      </template>
-                      <b-form-input
-                              id="profSituation"
-                              :placeholder="information.cont"
-                              trim
-                              readonly>
-                      </b-form-input>
-                  </b-form-group>
-              </b-card-text>
-            </b-tab>
-            <b-tab title="Ação">
-              <b-card-text>
-                Tipo : {{type}}
-                
-                Nome: {{finalName}}
-
-                <b-form-group>
-                      <template v-slot:prepend>
-                          <b-input-group-text>
-                          </b-input-group-text>
-                      </template>
-                      <p></p>
-                      <b-card-sub-title class="mb-2">
-                        Número de Réplicas
-                        <span class="ml-1" v-b-tooltip.hover title="A alteração deste número pode levar a sob ou sobrecargas da orquestração">
-                          <b-icon-info></b-icon-info>
-                        </span>
-                      </b-card-sub-title>
-                      <b-form-input
-                              id="replicas"
-                              :placeholder="replicas"
-                              v-model="finalInformation.replicas"
-                              trim>
-                      </b-form-input>
-                      <p></p>
-                      <b-card-sub-title class="mb-2">
-                        Limite de Cpu
+            <div class="card" >
+              <div class="card-header indigo lighten-3 content-center">
+                <i class="fab fa-flickr icon text-black  my-4 display-4">Informação geral</i>
+              </div>
+              <div class="card-body row text-center">
+                  <div class="col">
+                    <div class="text-value-xl">Nome do Controlador</div>
+                    <div class="text-uppercase text-muted small">{{finalName}}</div>
+                  </div>
+                    <div class="col">
+                    <div class="text-value-xl">Tipo de Controlador</div>
+                    <div class="text-uppercase text-muted small">{{type}}</div>
+                  </div>
+                  <div class="col">
+                    <div class="text-value-xl">Comm</div>
+                    <div class="text-uppercase text-muted small">{{information.comm}}</div>
+                  </div>
+                  
+                  <div class="vr"></div>
+                  <div class="col">
+                    <div class="text-value-xl">Cmd</div>
+                    <div class="text-uppercase text-muted small">{{information.cmd}}</div>
+                  </div>
+                 
+              </div>
+            </div>
+             <div class="card" >
+              <div class="card-header bg-behance content-center">
+                <i class="fab fa-behance icon text-black  my-4 display-4">Métricas</i>
+              </div>
+              <div class="card-body row text-center">
+                  <div class="col">
+                    <div class="text-value-xl">Pid</div>
+                    <div class="text-uppercase text-muted small">{{information.pid}}</div>
+                  </div>
+                  <div class="col">
+                    <div class="text-value-xl">PPid</div>
+                    <div class="text-uppercase text-muted small">{{information.ppid}}</div>
+                  </div>
+                  <div class="vr"></div>
+                  <div class="col">
+                    <div class="text-value-xl">Host</div>
+                    <div class="text-uppercase text-muted small">{{information.host}}</div>
+                  </div>
+                  <div class="col">
+                    <div class="text-value-xl">Rss</div>
+                    <div class="text-uppercase text-muted small">{{information.rss}}</div>
+                  </div>
+                  <div class="col">
+                    <div class="text-value-xl">Cont</div>
+                    <div class="text-uppercase text-muted small">{{information.cont}}</div>
+                  </div>
+              </div>
+            </div>
+              <div class="card" >
+                <div class="card-header bg-behance content-center">
+                  <i class="fab fa-behance icon text-black  my-4 display-4">Recursos</i>
+                </div>
+                <div class="card-body row text-center">
+                  <div class="col">
+                      <div class="text-value-xl">Número de Réplicas
+                          <span class="ml-1" v-b-tooltip.hover title="A alteração deste número pode levar a sob ou sobrecargas da orquestração">
+                            <b-icon-info></b-icon-info>
+                          </span>
+                          </div>
+                      <div class="text-uppercase text-muted small">
+                        <b-form-input
+                                id="replicas"
+                                v-model="finalInformation.replicas"
+                                trim>
+                        </b-form-input>
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="text-value-xl">Limite de Cpu
                         <span class="ml-1" v-b-tooltip.hover title="Este número deve ser sempre maior ou igual ao request cpu e deve ter em conta a orquestração podendo levar a falhas ">
                           <b-icon-info></b-icon-info>
                         </span>
-                      </b-card-sub-title>
-                      <b-form-input
-                              id="replicas "
-                              :placeholder="replicas"
-                              v-model="finalInformation.limitcpu"
-                              trim>
-                      </b-form-input>
-                      <p></p>
-                      <b-card-sub-title class="mb-2">
-                        Limite de Memória
+                          </div>
+                      <div class="text-uppercase text-muted small">
+                        <b-form-input
+                                id="replicas"
+                                v-model="finalInformation.limitcpu"
+                                trim>
+                        </b-form-input>
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="text-value-xl">Limite de Memória
                         <span class="ml-1" v-b-tooltip.hover title="Este número deve ser sempre maior ou igual ao request memory e deve ter em conta a orquestração podendo levar a falhas ">
                           <b-icon-info></b-icon-info>
                         </span>
-                      </b-card-sub-title>
-                      <b-form-input
-                              id="replicas  "
-                              :placeholder="replicas"
-                              v-model="finalInformation.limitmemory"
-                              trim>
-                      </b-form-input>
-                      <p></p>
-                      <b-card-sub-title class="mb-2">
-                        Request CPU
+                          </div>
+                      <div class="text-uppercase text-muted small">
+                        <b-form-input
+                                id="replicas"
+                                v-model="finalInformation.limitmemory"
+                                trim>
+                        </b-form-input>
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="text-value-xl">Request CPU
                         <span class="ml-1" v-b-tooltip.hover title="Este número deve ser sempre menor ou igual ao limite de cpu">
                           <b-icon-info></b-icon-info>
                         </span>
-                      </b-card-sub-title>
-                      <b-form-input
-                              id="replicas "
-                              :placeholder="replicas"
-                              v-model="finalInformation.requestcpu"
-                              trim>
-                      </b-form-input>
-                      <p></p>
-                      <b-card-sub-title class="mb-2">
-                        Request Memory
+                        </div>
+                      <div class="text-uppercase text-muted small">
+                        <b-form-input
+                                id="replicas"
+                                v-model="finalInformation.requestcpu"
+                                trim>
+                        </b-form-input>
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="text-value-xl">Request Memory
                         <span class="ml-1" v-b-tooltip.hover title="Este número deve ser sempre menor ou igual ao limite de memória">
                           <b-icon-info></b-icon-info>
                         </span>
-                      </b-card-sub-title>
-                      <b-form-input
-                              id="replicas"
-                              :placeholder="replicas"
-                              v-model="finalInformation.requestmemory"
-                              trim>
-                      </b-form-input>
-                  </b-form-group>
-             
-              </b-card-text>
-            </b-tab>
-          </b-tabs>
-        </b-card>
+                          </div>
+                      <div class="text-uppercase text-muted small">
+                        <b-form-input
+                                id="replicas"
+                                v-model="finalInformation.requestmemory"
+                                trim>
+                        </b-form-input>
+                      </div>
+                  </div>
+                  
+
+             </div>
+        </div>
       </div>
       <template v-slot:modal-footer="{ cancel, ok }">
             <b-button variant="outline-secondary" v-on:click="cancel()">Cancelar</b-button>
@@ -264,11 +264,10 @@ async function draw(view:any) {
         caption: "cmd",
         size: "cputime",
         community: "host",
-        clickEvent: (properties:any) => {
+        DoubleClickEvent: (properties:any) => {
           var cmd = properties.properties
           if(properties.properties.fake==undefined){
              view.show(properties.properties.cont)
-            view.choosenNode=properties.properties.cmd
             view.fill(properties.properties)
           }
         }
@@ -287,18 +286,18 @@ async function draw(view:any) {
 
   let viz= await new NeoVis(config);
   viz.registerOnEvent( 'completed', () => {
-    var a;
-    view.nodes(viz._nodes)
+    let a = viz._nodes
+    view.fillTable(viz._nodes)
 } );
   var array = getArray()
   await viz.render(array,"normal","viz");
+  
 }
 function drawAgain(size:any, instance1:any, instance2:any,process1:any,process2:any,orderBy:any) {
   var conditions;
   if (size == undefined) {
     size="cputime"
   }
-  console.log("1"+size+" 2"+instance1+" i3"+instance2+" 4"+process1+" 5"+process2+" 6"+orderBy)
   
   if (instance1 != "0") {
     conditions = "p1.host contains '" + instance1 + "' ";
@@ -349,10 +348,10 @@ function drawAgain(size:any, instance1:any, instance2:any,process1:any,process2:
       conditions +
       " return p"
   };
-  console.log(config.initial_cypher)
   var viz = new NeoVis(config);
   var array = getArray()
- viz.render(array,orderBy,"viz");
+  
+  viz.render(array,orderBy,"viz");
 }
 function reDraw() {
   var a = <HTMLInputElement>document.getElementById("instance1");
@@ -416,17 +415,23 @@ export default class NeoVisComponent extends Vue {
   choosenNode=null;
   type="teste";
   name="teste";
+  isBusy=false;
   finalName="teste"
+  fields=[ { key: 'originalProperties.cmd', label: 'CMD',sortable: true },{ key: 'originalProperties.cont', label: 'Cont',sortable: true },{key: 'originalProperties.pid', label: 'Pid',sortable: true },{key: 'originalProperties.ppid', label: 'ppid',sortable: true },{key:'originalProperties.rss', label:'RAM',sortable: true}]
+  fields2=[{ key: 'originalProperties.cmd', label: 'CMD',sortable: true },{ key: 'originalProperties.cont', label: 'Cont',sortable: true },{key:'originalProperties.host', label:'Host',sortable:true},{key: 'originalProperties.pid', label: 'Pid',sortable: true },{key: 'originalProperties.ppid', label: 'ppid',sortable: true },{key:'originalProperties.rss', label:'RAM',sortable: true},{key:'originalProperties.cputime', label:'CPU',sortable: true}]
+  showTable=false
+  isBusy2=false
   estado:any={id:"0",msg:""}
   maximo=100;
   valor=0;
   replicas=0;
+  pods:string[]=[];
   //pod's atributes  when  we clicked
   originalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
   //pod's information when we close the modal
   finalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
   //information passed to the modal 
-  information:any={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null}
+  information:any={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null,ppid:null}
   //namespace
   namespace="teste"
   
@@ -445,6 +450,28 @@ export default class NeoVisComponent extends Vue {
   drawAgain(a:any,b:any,c:any,d:any,e:any,f:any){
     drawAgain(a,b,c,d,e,f);
   }
+
+  //Function used to  fill the table
+
+  fillTable(arr:any){
+
+    for(var key in arr){
+      if(arr[key].originalProperties.fake==undefined){
+        arr[key].originalProperties.rss=this.verify(objectPath.get( arr[key], 'originalProperties.rss' ),0)
+        arr[key].originalProperties.cputime=this.verify(objectPath.get( arr[key], 'originalProperties.cputime' ),0)
+        this.pods.push(arr[key])
+      }
+    }
+    this.isBusy=true;
+
+  }
+
+  /*function used to open the modal that contains the bigger table*/
+
+  seeMore(){
+      this.showTable=true
+  }
+
 
   //Function used to fill the box with the names of the processes (cmd atribute in SYSQUERY)
 
@@ -469,7 +496,9 @@ export default class NeoVisComponent extends Vue {
    * @param {Integer} b value returned if a its undefined
    */
 
-  verify ( a:any, b:any ) { return a != undefined ? a : b }
+  verify ( a:any, b:any ) { 
+    return a != undefined ? a : b 
+    }
 
   /**
    * 
@@ -615,8 +644,9 @@ export default class NeoVisComponent extends Vue {
     this.information.host=information.host
     this.information.comm=information.comm
     this.information.rss=information.rss/1024
-    this.information.rss=this.information.rss.toString()+" MB"
-    this.information.pid=information.ppid
+    this.information.rss=this.information.rss.toFixed(4).toString()+" MB"
+    this.information.pid=information.pid
+    this.information.ppid=information.ppid
     this.information.cont=information.cont
   }
   
@@ -650,14 +680,29 @@ body {
 }
 
 .modal .modal-huge {
-  max-width: 80%;
-  width: 80%;
+  min-width: 100%;
+  min-height: 200%;
+  padding: 1rem;
 }
 
+.b-table-sticky-header{
+  max-height:500px !important
+}
 .form{
    font-size: 40px important!
 }
 .syntax--comment.syntax--block {
   color: cadetblue;
+}
+
+.card-header{
+    padding: 0.5rem 1.25rem;
+}
+
+.card-body{
+    padding: 0.5rem 1.25rem;
+}
+.bg-tumblr {
+    background-color: #32506d !important;
 }
 </style>

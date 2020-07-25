@@ -73,7 +73,7 @@ import axios from 'axios';
 import NeoVis from '../../public/neovis.js';
 import  Array  from '../../public/json2';
 //Render scripts
-var op;
+var op:any;
 async function draw(view:any) {
   console.log("poderino")
   op=view
@@ -85,10 +85,15 @@ async function draw(view:any) {
     labels: {
       Pod: {
         caption:"cont",
+        community:"host",
         clickEvent: (properties:any) => {
           console.log("Lol")
           view.show(properties.properties.cont)
-        }
+          //drawAgain(properties.properties.cont)
+        },
+        DoubleClickEvent: (properties:any) => {
+          drawAgain(properties.properties.cont)
+        },
       }
     },
     relationships: {
@@ -110,6 +115,37 @@ async function draw(view:any) {
 
 }
 
+function drawAgain(prop:any){
+  var config = {
+    container_id: "vizp",
+    server_url: "neo4j://127.0.0.1:7687",
+    server_user: "neo4j",
+    server_password: "123456",
+    labels: {
+      Pod: {
+        caption:"cont",
+        community:"host",
+        clickEvent: (properties:any) => {
+        }
+      }
+    },
+    relationships: {
+      Pod: {
+        caption: false,
+        thickness: "sent_bytes"
+      }
+    },
+
+    initial_cypher:
+      "MATCH p=(p1)-[r:Pod]-(p2) where p1.cont='"+prop+"' RETURN p "
+  };
+  console.log(JSON.stringify(config.initial_cypher))
+  var viz =  new NeoVis(config);
+  var b = new Array;
+  var array = b.getArray()
+  console.log("hereee")
+  viz.render(array,"normal","vizp");
+}
 
 @Component({})
 export default class HostsComponent extends Vue {

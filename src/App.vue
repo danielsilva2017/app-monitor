@@ -47,10 +47,10 @@
                 <NeoVis/>
             </div>
             <div :class="'tab-pane fade '+ (currentpage==2 ? 'show active': '') " role="tabpanel" aria-labelledby="tabs-icons-text-2-tab">
-                <Pods/>
+               <Pods/>
             </div>
             <div :class="'tab-pane fade '+ (currentpage==3 ? 'show active': '') " role="tabpanel" aria-labelledby="tabs-icons-text-3-tab">
-                <Hosts/>
+              <Hosts/>
             </div>
         </div>
     </div>
