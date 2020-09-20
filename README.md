@@ -16,9 +16,19 @@ Main features:
 - [x] The user can see a detail information for each  processes,hosts or pods - both on a table and on a graph;
 - [x] The user can edit the recourses allocated to the controllers;
 
+## Processes View
 ![Process View](https://i.imgur.com/40s5HkS.png)
+
+## Pods View
+
 ![Pod View](https://i.imgur.com/d8HtLRM.png)
+
+## Hosts View
+
 ![Host View](https://i.imgur.com/R2qTlDf.png)
+
+## Recources
+
 ![Recources](https://i.imgur.com/L4ZllqI.png)
 ## Project setup
 ```
