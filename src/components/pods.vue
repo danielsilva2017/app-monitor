@@ -8,7 +8,17 @@
                         
                     </b-card-body>
                 </b-card>
-                <b-card  class="bg-secondary small" border-variant="secondary" header="Nome do Pod" header-border-variant="secondary" no-body>
+                <b-card  class="bg-secondary small" border-variant="secondary" header="Nome do pod" header-border-variant="secondary" no-body>
+                    <b-card-body>
+                        <b-card-text class="small">{{name!= null ? name: 'Nenhum nó selecionado'}}</b-card-text>
+                    </b-card-body>
+                </b-card>
+                   <b-card  class="bg-secondary small" border-variant="secondary" header="Ip do pod" header-border-variant="secondary" no-body>
+                    <b-card-body>
+                        <b-card-text class="small">{{podIP!= null ? podIP: 'Nenhum nó selecionado'}}</b-card-text>
+                    </b-card-body>
+                </b-card>
+                <b-card  class="bg-secondary small" border-variant="secondary" header="Nome do Controlador" header-border-variant="secondary" no-body>
                     <b-card-body>
                         <b-card-text class="small">{{originalInformation.podName != null ? originalInformation.podName: 'Nenhum nó selecionado'}}</b-card-text>
                     </b-card-body>
@@ -59,6 +69,19 @@
             </div>
            
         </div>
+      <p></p>
+        <div class="col-md-12">
+          
+           <b-table small head-variant="light" bordered="bordered" sticky-header hover  :items="pods" :busy="!isBusy" :fields="fields" >
+              <template v-slot:table-busy>
+                <div class="text-center text-danger my-2">
+                  <b-spinner class="align-middle"></b-spinner>
+                  <strong> Loading...</strong>
+                </div>
+              </template>
+            </b-table>
+            
+    </div>
     </div>
 
 </template>
@@ -88,10 +111,16 @@ async function draw(view:any) {
         community:"host",
         clickEvent: (properties:any) => {
           console.log("Lol")
+          if(op.onChange==false){
           view.show(properties.properties.cont)
+          }
+          else{
+            op.itsOnChange()
+          }
           //drawAgain(properties.properties.cont)
         },
         DoubleClickEvent: (properties:any) => {
+          
           drawAgain(properties.properties.cont)
         },
       }
@@ -110,7 +139,10 @@ async function draw(view:any) {
   var viz =  new NeoVis(config);
   var b = new Array;
   var array = b.getArray()
-  console.log("hereee")
+  viz.registerOnEvent( 'completed', () => {
+    let a = viz._nodes
+    view.fillTable(viz._nodes)
+} );
   viz.render(array,"normal","vizp");
 
 }
@@ -166,6 +198,14 @@ export default class HostsComponent extends Vue {
   isEditing=false;
   variant="info"
   button="Editar"
+  pods:string[]=[]
+  isBusy=false;
+  podName="";
+  podIP=0;
+  onChange=false;
+
+  fields=[ { key: 'originalProperties.cont', label: 'Cont',sortable: true },{key: 'originalProperties.host', label: 'Host',sortable: true },{key:'originalProperties.rss', label:'RAM',sortable: true}]
+
   change(){
       if(this.isEditing==true){
           this.isEditing=!this.isEditing
@@ -194,7 +234,7 @@ export default class HostsComponent extends Vue {
     var type:any;
     var name:any;
     console.log("almost")
-    await axios.get('http://localhost:3000/pods').then(response => 
+    await axios.get('http://localhost:3001/pods').then(response => 
     {
      
      pods=response.data[0].items
@@ -205,7 +245,9 @@ export default class HostsComponent extends Vue {
       if(pods[i].metadata.uid==temp){
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
+        this.podName=pods[i].metadata.ownerReferences[0].name
         this.namespace=pods[i].metadata.namespace;
+        this.podIP=pods[i].status.podIP;
         
         break;
       }
@@ -213,8 +255,8 @@ export default class HostsComponent extends Vue {
    console.log("UAAAA"+this.namespace)
     if(this.type=="replicaset"){
      var deploymentName;
-     console.log('sippphttp://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace)
-        await axios.get('http://localhost:3000/replicaset/'+this.name+"/"+this.namespace).then(response => 
+     console.log('sippphttp://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace)
+        await axios.get('http://localhost:3001/replicaset/'+this.name+"/"+this.namespace).then(response => 
         (
           this.name= response.data.metadata.ownerReferences[0].name
         ))
@@ -222,8 +264,8 @@ export default class HostsComponent extends Vue {
         
     }
    
-    console.log('hiii http://localhost:3000/'+this.type+'/'+this.name)
-    await axios.get('http://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
+    console.log('hiii http://localhost:3001/'+this.type+'/'+this.name)
+    await axios.get('http://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
         this.originalInformation.podName=response.data.metadata.name
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
@@ -240,7 +282,18 @@ export default class HostsComponent extends Vue {
     this.originalInformation.requestmemory=this.finalInformation.requestmemory
     
  }
+  fillTable(arr:any){
 
+    for(var key in arr){
+      if(arr[key].originalProperties.fake==undefined){
+        arr[key].originalProperties.rss=this.verify(objectPath.get( arr[key], 'originalProperties.rss' ),0)
+        arr[key].originalProperties.cputime=this.verify(objectPath.get( arr[key], 'originalProperties.cputime' ),0)
+        this.pods.push(arr[key])
+      }
+    }
+    this.isBusy=true;
+
+  }
  verify ( a:any, b:any) { return a != undefined ? a : b }
   async updateAll(){
     console.log("here"+this.originalInformation.replicas+"  "+this.finalInformation.replicas)
@@ -249,6 +302,7 @@ export default class HostsComponent extends Vue {
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
     if(this.originalInformation.requestcpu!=this.finalInformation.requestcpu) await this.updateRequestCpu()
     if(this.originalInformation.requestmemory!=this.finalInformation.requestmemory) await this.updateRequestMemory()
+    this.$root.$emit('startQueue');
     
     
   }
@@ -277,7 +331,7 @@ export default class HostsComponent extends Vue {
    */
 
   async getState(){
-    axios.get('http://localhost:3000/'+this.type+'/state/state/state').then(response => 
+    axios.get('http://localhost:3001/'+this.type+'/state/state/state').then(response => 
     {
       this.estado.id=response.data.id
       this.estado.msg=response.data.msg
@@ -396,8 +450,21 @@ delay ( time:number ) {
     this.isEditing=!this.isEditing
     this.button="Editar"
  }
-  
+  itsOnChange(){
+    this.$bvToast.toast( "Existe uma mudança em curso, não pode realizar nenhuma ação", {
+                title: 'Mudança em curso',
+                variant: 'danger',
+                solid: true
+            } );
 
+  }
+ onChanger(){
+   this.onChange=!this.onChange
+ }
+
+async created(){
+  this.$root.$on( 'onChanger',this.onChanger);
+}
 
 mounted(){
     draw(this)
@@ -407,7 +474,7 @@ mounted(){
 <style scoped>
 #vizp {
   
-  height: 500px;
+  height: 700px;
   border: 1px solid lightgray;
   font: 22pt arial;
 }

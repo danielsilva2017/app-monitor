@@ -104,6 +104,12 @@
       <div>
             <div class="card" >
               <div class="card-header indigo lighten-3 content-center">
+                <i class="fab fa-flickr icon text-black  my-4 display-4">Mapa</i>
+              </div>
+                <div id="viz2"></div>
+            </div>
+            <div class="card" >
+              <div class="card-header indigo lighten-3 content-center">
                 <i class="fab fa-flickr icon text-black  my-4 display-4">Informação geral</i>
               </div>
               <div class="card-body row text-center">
@@ -264,11 +270,18 @@ async function draw(view:any) {
         caption: "cmd",
         size: "cputime",
         community: "host",
-        DoubleClickEvent: (properties:any) => {
+        DoubleClickEvent:async (properties:any) => {
           var cmd = properties.properties
-          if(properties.properties.fake==undefined){
-             view.show(properties.properties.cont)
-            view.fill(properties.properties)
+          if(properties.properties.fake==undefined && op.onChange==false){
+           
+             await view.show(properties.properties.cont)
+             view.fill(properties.properties)
+             await view.delay(10000)
+             
+             drawInsideModal(properties.properties.cmd)
+          }
+          if(op.onChange!=false){
+            op.itsOnChange()
           }
         }
       }
@@ -292,6 +305,38 @@ async function draw(view:any) {
   var array = getArray()
   await viz.render(array,"normal","viz");
   
+}
+async function drawInsideModal(cmd:any){
+  console.log("draw inside xd")
+  var config = {
+    container_id: "viz2",
+    server_url: "neo4j://127.0.0.1:7687",
+    server_user: "neo4j",
+    server_password: "123456",
+    labels: {
+      Process: {
+        caption: "cmd",
+        size: "cputime",
+        community: "host",
+        DoubleClickEvent: (properties:any) => {
+          
+        }
+      }
+    },
+    relationships: {
+      NoSocket2: {
+        caption: false,
+        thickness: "sent_bytes"
+      }
+    },
+
+    initial_cypher:
+      "match p=(p1)-[n:NoSocket2]-(p2)  where p1.cmd contains '"+cmd+"' return p"
+  };
+    let viz= await new NeoVis(config);
+  var array = getArray()
+  await viz.render(array,"normal","viz2");
+
 }
 function drawAgain(size:any, instance1:any, instance2:any,process1:any,process2:any,orderBy:any) {
   var conditions;
@@ -329,6 +374,7 @@ function drawAgain(size:any, instance1:any, instance2:any,process1:any,process2:
         community: "host",
         clickEvent:(properties:any) =>{
             if(properties.properties.fake==undefined){
+              
               op.show(properties.properties.cont)
               op.choosenNode=properties.properties.cmd
               op.fill(properties.properties)
@@ -406,6 +452,7 @@ export default class NeoVisComponent extends Vue {
 
 
   // function used to show or not the modal
+  showComplete=false;
   modalShow=false;
   labels:string[]=[];
   instance1="0";
@@ -434,6 +481,8 @@ export default class NeoVisComponent extends Vue {
   information:any={cmd:null,host:null,rss:null,pid:null,cont:null,comm:null,ppid:null}
   //namespace
   namespace="teste"
+
+  onChange=false;
   
   /**
    * 
@@ -449,6 +498,10 @@ export default class NeoVisComponent extends Vue {
   //Calls the built-in html function named drawAgain
   drawAgain(a:any,b:any,c:any,d:any,e:any,f:any){
     drawAgain(a,b,c,d,e,f);
+  }
+
+  async delay ( time:number ) {
+    return new Promise( resolve => setTimeout( resolve, time ) )
   }
 
   //Function used to  fill the table
@@ -510,7 +563,6 @@ export default class NeoVisComponent extends Vue {
    * 
    */
   async  show(cont:any){
-     
     var temp=cont
     var pods:any;
     var type;
@@ -555,6 +607,7 @@ export default class NeoVisComponent extends Vue {
     this.originalInformation.requestcpu=this.finalInformation.requestcpu
     this.originalInformation.requestmemory=this.finalInformation.requestmemory
     this.modalShow=true
+    this.showComplete=true
  }
 
  /**
@@ -571,6 +624,7 @@ export default class NeoVisComponent extends Vue {
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
     if(this.originalInformation.requestcpu!=this.finalInformation.requestcpu) await this.updateRequestCpu()
     if(this.originalInformation.requestmemory!=this.finalInformation.requestmemory) await this.updateRequestMemory()
+    this.$root.$emit('startQueue')
     
     
   }
@@ -663,6 +717,24 @@ export default class NeoVisComponent extends Vue {
     draw(this); 
   }
 
+  itsOnChange(){
+    this.$bvToast.toast( "Existe uma mudança em curso, não pode realizar nenhuma ação", {
+                title: 'Mudança em curso',
+                variant: 'danger',
+                solid: true
+            } );
+
+  }
+  onChanger(){
+    console.log('onChange')
+   this.onChange=!this.onChange
+ }
+
+async created(){
+  this.$root.$on( 'onChanger',this.onChanger);
+}
+
+
   
 }
 </script>
@@ -675,6 +747,12 @@ body {
 #viz {
   
   height: 500px;
+  border: 1px solid lightgray;
+  font: 22pt arial;
+}
+
+#viz2{
+  height: 200px;
   border: 1px solid lightgray;
   font: 22pt arial;
 }

@@ -1,7 +1,8 @@
 <template>
 <div  v-if="estado.id!=0" class="container" id="barra">
-            
+             {{queue.currentLeft}} / {{queue.number}}
       <b-progress :max="maximo" height="2rem">
+                     
                       <b-progress-bar  show-progress animated :value="valor">
                         Estado - {{estado.msg}}: <strong>{{ valor.toFixed(2) }} / {{ maximo }}</strong>
                       </b-progress-bar>
@@ -17,7 +18,9 @@ export default class ActionComponent extends Vue {
     valor:number=0;
     type:any="";
     estado:any={id:"0",msg:""}
+    queue:any={number:"0",currentLeft:"0"}
     maximo:number=100;
+    urls:any=[]
     @Prop({ type: String })
     public readonly title!: string;
 
@@ -47,14 +50,25 @@ export default class ActionComponent extends Vue {
    */
 
   async getState(){
-      console.log('http://localhost:3000/'+this.type+'/state/state/state')
-    axios.get('http://localhost:3000/'+this.type+'/state/state/state').then(response => 
+      console.log('http://localhost:3001/geral/state')
+    axios.get('http://localhost:3001/geral/state').then(response => 
     {
       this.estado.id=response.data.id
       this.estado.msg=response.data.msg
       
     })  
     await this.updateValue(this.estado)
+  }
+
+  async getQueue(){
+     axios.get('http://localhost:3001/geral/queue').then(response => 
+    {
+      console.log("brothes"+JSON.stringify(response))
+      this.queue.number=response.data.number
+      console.log("luuuul;"+this.queue.number)
+      this.queue.currentLeft=response.data.currentLeft
+      
+    }) 
   }
 
   /**
@@ -108,11 +122,13 @@ delay ( time:number ) {
  async updateReplicas(type:string,namespace:string,name:string,finalInformation:string){
     
     this.type=type
-      axios.post('http://localhost:3000/'+type+'/replicas/'+namespace+'/'+name+'/'+finalInformation).then(response => 
+    console.log('replicando')
+    this.urls.push('http://localhost:3001/'+type+'/replicas/'+namespace+'/'+name+'/'+finalInformation)
+     /* axios.post('http://localhost:3001/'+type+'/replicas/'+namespace+'/'+name+'/'+finalInformation).then(response => 
     (
       console.log(response)
-   ))
-  this.feedback('Número Réplicas','O número de réplicas foi atualizado com sucesso.')
+   ))*/
+  //this.feedback('Número Réplicas','O número de réplicas foi atualizado com sucesso.')
 }
 
 
@@ -126,11 +142,12 @@ delay ( time:number ) {
 
  async updateLimitCpu(type:string,namespace:string,name:string,finalInformation:string){
      this.type=type
-      axios.post('http://localhost:3000/'+type+'/resources/'+namespace+'/limits/cpu/'+name+'/'+finalInformation).then(response => 
+     this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/cpu/'+name+'/'+finalInformation)
+    /*  axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/cpu/'+name+'/'+finalInformation).then(response => 
     (
       console.log("tag"+response)
-   ))
-    this.feedback('Limite cpu','O limite de cpu foi atualizado com sucesso.')
+   ))*/
+   //this.feedback('Limite cpu','O limite de cpu foi atualizado com sucesso.')
   }
 
   /**
@@ -141,12 +158,13 @@ delay ( time:number ) {
  */
   async updateLimitMemory(type:string,namespace:string,name:string,finalInformation:string){
     this.type=type
-      axios.post('http://localhost:3000/'+type+'/resources/'+namespace+'/limits/memory/'+name+'/'+finalInformation).then(response => 
+    this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/memory/'+name+'/'+finalInformation)
+    /*  axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/memory/'+name+'/'+finalInformation).then(response => 
     (
       console.log(response)
-   ))
+   ))*/
 
-   this.feedback('Limite memória','O limite de memória foi atualizado com sucesso.')
+   //this.feedback('Limite memória','O limite de memória foi atualizado com sucesso.')
     
   }
 
@@ -159,11 +177,12 @@ delay ( time:number ) {
 
   async updateRequestCpu(type:string,namespace:string,name:string,finalInformation:string){
       this.type=type
-   axios.post('http://localhost:3000/'+type+'/resources/'+namespace+'/requests/cpu/'+name+'/'+finalInformation).then(response => 
+      this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/cpu/'+name+'/'+finalInformation)
+   /*axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/cpu/'+name+'/'+finalInformation).then(response => 
     (
       console.log(response)
-   ))
-   this.feedback('Request cpu','O request de cpu foi atualizado com sucesso.')
+   ))*/
+   //this.feedback('Request cpu','O request de cpu foi atualizado com sucesso.')
     
   }
 
@@ -176,15 +195,43 @@ delay ( time:number ) {
 
   async updateRequestMemory(type:string,namespace:string,name:string,finalInformation:string){
       this.type=type
-    axios.post('http://localhost:3000/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation).then(response => 
+      this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation)
+    /*axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation).then(response => 
     (
       console.log(response)
-   ))
-   this.feedback('Request Memory','O request de  memória foi atualizado com sucesso.')
+   ))*/
+   //this.feedback('Request Memory','O request de  memória foi atualizado com sucesso.')
     
   }
 
+  async startqueue(){
+    console.log(this.urls)
+    this.$root.$emit('onChanger')
+    axios.post('http://localhost:3001/geral/queue', { data: this.urls }).then(response => 
+    (
+      console.log(response)
+    ))
+    while ( this.estado.id != "4") {
+                await this.delay( 10000 );
+
+                await this.getState()
+            }
+    this.$root.$emit('onChager')
+  }
+
   async created(){
+        await this.getQueue()
+          await this.delay( 5000 );
+        console.log("looool"+this.queue.number)
+        if(this.queue.number!="0"){
+          this.$root.$emit('onChanger')
+           while ( this.estado.id != "4") {
+                await this.delay( 10000 );
+
+                await this.getState()
+            }
+          this.$root.$emit('onChanger')
+        }
         this.$root.$on( 'feedback',async ( title : string, str : string, type:string ) => {
             this.type=type;
             this.estado.id = "1"
@@ -205,11 +252,13 @@ delay ( time:number ) {
             this.updateValue(this.estado)
             
         } );
-        this.$root.$on( 'updateReplicas',this.updateReplicas);
-        this.$root.$on( 'updateLimitCpu',this.updateLimitCpu);
-        this.$root.$on( 'updateLimitMemory',this.updateLimitMemory);
-        this.$root.$on( 'updateRequestCpu',this.updateRequestCpu);
-        this.$root.$on( 'updateRequestMemory',this.updateRequestMemory);
+        await this.$root.$on( 'updateReplicas',this.updateReplicas);
+        await this.$root.$on( 'updateLimitCpu',this.updateLimitCpu);
+        await this.$root.$on( 'updateLimitMemory',this.updateLimitMemory);
+        await this.$root.$on( 'updateRequestCpu',this.updateRequestCpu);
+        await this.$root.$on( 'updateRequestMemory',this.updateRequestMemory);
+        await this.$root.$on( 'startQueue',this.startqueue);
+        
     }
  
 }

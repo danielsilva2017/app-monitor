@@ -70,6 +70,7 @@ finalPods:any=[];
 clicked=false;
 instances:any[]=[];
 isBusy=false;
+onChange=false;
 
 
 fields=[ { key: 'metadata.name', label: 'Name',sortable: true },{ key: 'metadata.ownerReferences[0].kind', label: 'Tipo',sortable: true },{ key: 'metadata.ownerReferences[0].name', label: 'Owner',sortable: true },{ key: 'status.phase', label: 'Status',sortable: true },{ key:'status.podIP', label:'Ip',sortable: true}]
@@ -78,7 +79,7 @@ async load(name:any){
   this.finalPods=[];
   if(this.clicked==false){this.clicked=true;}
   var pods:any;
-  await axios.get('http://localhost:3000/pods').then(response => 
+  await axios.get('http://localhost:3001/pods').then(response => 
     (
      
      pods=response.data[0].items
@@ -96,6 +97,14 @@ rowClass(item:any,type:any) {
         if (!item || type !== 'row') return
   if(item.status.phase=="Running"){return 'table-success'}
 }
+onChanger(){
+   this.onChange=!this.onChange
+ }
+
+async created(){
+  this.$root.$on( 'onChanger',this.onChanger);
+}
+
 
 mounted(){
     draw(this)

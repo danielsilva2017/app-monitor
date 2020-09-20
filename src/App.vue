@@ -5,7 +5,7 @@
         <div class="container">
 
             <b-navbar-brand >
-                Monitor
+                CloudOverWatch
                 <span class="small text-warning font-weight-bold ml-1" >Beta</span>
                  
             </b-navbar-brand>
@@ -16,7 +16,7 @@
                 <b-navbar-nav class="ml-auto">
                     <b-button variant="warning" style="float:right" v-on:click="show()">Imagens</b-button>
                 
-                    <b-button :variant="variant" style="margin-right: 0" v-on:click="update()">{{name}}</b-button>
+                    <b-button :variant="variant" style="margin-right: 0" v-on:click="update()" :disabled="onChange">{{name}}</b-button>
                 </b-navbar-nav>
             </b-collapse>
             
@@ -131,6 +131,7 @@ export default class App extends Vue {
   assert=false
   variant="success"
   image={keyword:null,url:null}
+  onChange=false;
   show(){
     this.modalShow=true
   }
@@ -180,6 +181,14 @@ export default class App extends Vue {
           solid: true
       } );
   }
+  onChanger(){
+   this.onChange=!this.onChange
+ }
+
+async created(){
+  this.$root.$on( 'onChanger',this.onChanger);
+}
+
 }
 </script>
 
