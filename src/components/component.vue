@@ -568,7 +568,7 @@ export default class NeoVisComponent extends Vue {
     var type;
     var name;
    
-    await axios.get('http://localhost:3000/pods').then(response => 
+    await axios.get('http://localhost:3001/pods').then(response => 
     (
      
      pods=response.data[0].items
@@ -584,14 +584,14 @@ export default class NeoVisComponent extends Vue {
    }
     if(this.type=="replicaset"){
      var deploymentName;
-        await axios.get('http://localhost:3000/replicaset/'+this.name+"/"+this.namespace).then(response => 
+        await axios.get('http://localhost:3001/replicaset/'+this.name+"/"+this.namespace).then(response => 
         (
           this.name= response.data.metadata.ownerReferences[0].name
         ))
         this.type="deployment"
         
     }
-    await axios.get('http://localhost:3000/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
+    await axios.get('http://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
         this.finalName=response.data.metadata.name
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
