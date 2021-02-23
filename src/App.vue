@@ -137,7 +137,7 @@ export default class App extends Vue {
   }
   images(){
     console.log("here")
-      this.$http.post('http://localhost:3000/image', this.image, {
+      this.$http.post('http://localhost:3001/image', this.image, {
         headers: {
             'Content-Type': 'application/json',
       }}).then(response => 
@@ -159,7 +159,7 @@ export default class App extends Vue {
 
   start(){
     this.variant="danger"
-      this.$http.post('http://localhost:3000/monitor/start').then(response => 
+      this.$http.post('http://localhost:3001/monitor/start').then(response => 
     (
       console.log(response)
    ))
@@ -171,7 +171,7 @@ export default class App extends Vue {
   }
     stop(){
       this.variant="success"
-      this.$http.post('http://localhost:3000/monitor/stop').then(response => 
+      this.$http.post('http://localhost:3001/monitor/stop').then(response => 
     (
       console.log(response)
    ))
