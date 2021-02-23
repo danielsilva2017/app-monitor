@@ -63,9 +63,8 @@ export default class ActionComponent extends Vue {
   async getQueue(){
      axios.get('http://localhost:3001/geral/queue').then(response => 
     {
-      console.log("brothes"+JSON.stringify(response))
+     
       this.queue.number=response.data.number
-      console.log("luuuul;"+this.queue.number)
       this.queue.currentLeft=response.data.currentLeft
       
     }) 
@@ -122,7 +121,6 @@ delay ( time:number ) {
  async updateReplicas(type:string,namespace:string,name:string,finalInformation:string){
     
     this.type=type
-    console.log('replicando')
     this.urls.push('http://localhost:3001/'+type+'/replicas/'+namespace+'/'+name+'/'+finalInformation)
      /* axios.post('http://localhost:3001/'+type+'/replicas/'+namespace+'/'+name+'/'+finalInformation).then(response => 
     (
@@ -222,7 +220,6 @@ delay ( time:number ) {
   async created(){
         await this.getQueue()
           await this.delay( 5000 );
-        console.log("looool"+this.queue.number)
         if(this.queue.number!="0"){
           this.$root.$emit('onChanger')
            while ( this.estado.id != "4") {
