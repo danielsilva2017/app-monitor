@@ -46,19 +46,17 @@
                         <b-card-sub-title class="mb-2">Primeiro Host/Instância</b-card-sub-title>
                         <b-select v-model="instance1" id="instance1" >
                         <option value="0" selected>Todas</option>
-                        <option value="1">Instância 1</option>
-                        <option value="2">Instância 2</option>
-                        <option value="3">Instância 3</option>
-                        <option value="4">Instância 4</option>
+                        <option v-for="item in instances" :value="item" :key="item.id">
+      {{ item }}
+    </option>
                         </b-select>
                         <p></p>
                          <b-card-sub-title class="mb-2">Segundo Host/Instância</b-card-sub-title>
                         <b-select v-model="instance2" id="instance2">
                         <option value="0" selected>Todas</option>
-                        <option value="1">Instância 1</option>
-                        <option value="2">Instância 2</option>
-                        <option value="3">Instância 3</option>
-                        <option value="4">Instância 4</option>
+                        <option v-for="item in instances" :value="item" :key="item.id">
+      {{ item }}
+    </option>
                         </b-select>
                         <p></p>
                        <b-button type="submit" variant="outline-success float-right" class="card-link" v-on:click="reDraw" v-b-modal.privacy>Atualizar</b-button>
@@ -300,6 +298,7 @@ async function draw(view:any) {
   let viz= await new NeoVis(config);
   viz.registerOnEvent( 'completed', () => {
     let a = viz._nodes
+    view.nodes(viz._nodes)
     view.fillTable(viz._nodes)
 } );
   var array = getArray()
@@ -455,6 +454,7 @@ export default class NeoVisComponent extends Vue {
   showComplete=false;
   modalShow=false;
   labels:string[]=[];
+  instances:string[]=[];
   instance1="0";
   instance2="0";
   process1="0";
@@ -533,6 +533,10 @@ export default class NeoVisComponent extends Vue {
     for(let key in arr){
       if(!this.labels.includes((arr[key] as any).label)  && arr[key].label!="Socket" && arr[key].label!=undefined && arr[key].originalProperties.fake!="true" ){
         this.labels.push(arr[key].label)
+      }
+      if(!this.instances.includes((arr[key] as any).host)){
+        if(arr[key].host!=undefined) this.instances.push(arr[key].host)
+        
       }
     }
     
