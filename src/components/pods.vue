@@ -112,7 +112,7 @@ async function draw(view:any) {
         clickEvent: (properties:any) => {
           console.log("Lol")
           if(op.onChange==false){
-          view.show(properties.properties.cont)
+          view.show(properties.properties.cont,properties.properties.affinity)
           }
           else{
             op.itsOnChange()
@@ -203,6 +203,7 @@ export default class HostsComponent extends Vue {
   podName="";
   podIP=0;
   onChange=false;
+  index=0;
 
   fields=[ { key: 'originalProperties.cont', label: 'Cont',sortable: true },{key: 'originalProperties.host', label: 'Host',sortable: true },{key:'originalProperties.rss', label:'RAM',sortable: true}]
 
@@ -218,7 +219,7 @@ export default class HostsComponent extends Vue {
       
       
   }
-  async  show(cont:any){
+  async  show(cont:any,affinity:any){
    /* var arr = cont.split('/')
     var temp;
     if(arr.length==4){
@@ -233,7 +234,9 @@ export default class HostsComponent extends Vue {
     var pods:any;
     var type:any;
     var name:any;
-    console.log("almost")
+    var index:any;
+    var containerName:any;
+    
     await axios.get('http://localhost:3001/pods').then(response => 
     {
      
@@ -242,7 +245,15 @@ export default class HostsComponent extends Vue {
     })
     for(let i=0;i<pods.length;i++){
      
+      console.log("uuid"+temp)
       if(pods[i].metadata.uid==temp){
+        for(let j=0;j<pods[i].spec.containers.length;j++){
+          if(pods[i].status.containerStatuses[j].containerID.includes(affinity)){
+            containerName=pods[i].spec.containers[j].name;
+            index=j;
+          }
+
+        }
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
         this.podName=pods[i].metadata.ownerReferences[0].name
@@ -252,7 +263,7 @@ export default class HostsComponent extends Vue {
         break;
       }
    }
-   console.log("UAAAA"+this.namespace)
+   console.log("UAAAA"+this.namespace+this.type)
     if(this.type=="replicaset"){
      var deploymentName;
      console.log('sippphttp://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace)
@@ -264,23 +275,25 @@ export default class HostsComponent extends Vue {
         
     }
    
-    console.log('hiii http://localhost:3001/'+this.type+'/'+this.name)
+  console.log("owowo")
     await axios.get('http://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
-        this.originalInformation.podName=response.data.metadata.name
+        
+        
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
-        this.finalInformation.limitcpu=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.0.resources.limits.cpu' ),0)
-        this.finalInformation.limitmemory=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.0.resources.limits.memory' ),0)
-        this.finalInformation.requestcpu=this.verify(objectPath.get( response.data,'spec.template.spec.containers.0.resources.requests.cpu'),0)
-        this.finalInformation.requestmemory=this.verify(objectPath.get( response.data,'spec.template.spec.containers.0.resources.requests.memory'),0)
+        this.finalInformation.limitcpu=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.'+index+'.resources.limits.cpu' ),0)
+        this.finalInformation.limitmemory=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.'+index+'.resources.limits.memory' ),0)
+        this.finalInformation.requestcpu=this.verify(objectPath.get( response.data,'spec.template.spec.containers.'+index+'.resources.requests.cpu'),0)
+        this.finalInformation.requestmemory=this.verify(objectPath.get( response.data,'spec.template.spec.containers.'+index+'.resources.requests.memory'),0)
       })
-    
+    this.originalInformation.podName=containerName
     this.originalInformation.replicas=this.finalInformation.replicas
     this.originalInformation.limitcpu=this.finalInformation.limitcpu
     this.originalInformation.limitmemory=this.finalInformation.limitmemory
     this.originalInformation.requestcpu=this.finalInformation.requestcpu
     this.originalInformation.requestmemory=this.finalInformation.requestmemory
-    
+    this.index=index;
+    console.log("this index"+this.index)
  }
   fillTable(arr:any){
 
@@ -296,7 +309,7 @@ export default class HostsComponent extends Vue {
   }
  verify ( a:any, b:any) { return a != undefined ? a : b }
   async updateAll(){
-    console.log("here"+this.originalInformation.replicas+"  "+this.finalInformation.replicas)
+    console.log("here"+this.originalInformation.limitcpu+"  "+this.finalInformation.limitcpu)
     if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
     if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
@@ -402,7 +415,7 @@ delay ( time:number ) {
  */
 
  async updateLimitCpu(){
-    this.$root.$emit('updateLimitCpu',this.type,this.namespace,this.name,this.finalInformation.limitcpu)
+    this.$root.$emit('updateLimitCpu',this.type,this.namespace,this.name,this.finalInformation.limitcpu,this.index)
   }
 
   /**
@@ -413,7 +426,7 @@ delay ( time:number ) {
  */
   async updateLimitMemory(){
     
-      this.$root.$emit('updateLimitMemory',this.type,this.namespace,this.name,this.finalInformation.limitmemory)
+      this.$root.$emit('updateLimitMemory',this.type,this.namespace,this.name,this.finalInformation.limitmemory,this.index)
     
   }
 
@@ -425,7 +438,7 @@ delay ( time:number ) {
  */
 
   async updateRequestCpu(){
-    this.$root.$emit('updateRequestCpu',this.type,this.namespace,this.name,this.finalInformation.requestcpu)
+    this.$root.$emit('updateRequestCpu',this.type,this.namespace,this.name,this.finalInformation.requestcpu,this.index)
     
   }
 
@@ -437,7 +450,7 @@ delay ( time:number ) {
  */
 
   async updateRequestMemory(){
-    this.$root.$emit('updateRequestMemory',this.type,this.namespace,this.name,this.finalInformation.requestmemory)
+    this.$root.$emit('updateRequestMemory',this.type,this.namespace,this.name,this.finalInformation.requestmemory,this.index)
     
   }
   

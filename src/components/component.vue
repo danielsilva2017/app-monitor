@@ -112,7 +112,7 @@
               </div>
               <div class="card-body row text-center">
                   <div class="col">
-                    <div class="text-value-xl">Nome do Controlador</div>
+                    <div class="text-value-xl">Nome do container</div>
                     <div class="text-uppercase text-muted small">{{finalName}}</div>
                   </div>
                     <div class="col">
@@ -271,8 +271,7 @@ async function draw(view:any) {
         DoubleClickEvent:async (properties:any) => {
           var cmd = properties.properties
           if(properties.properties.fake==undefined && op.onChange==false){
-           
-             await view.show(properties.properties.cont)
+             await view.show(properties.properties.cont,properties.properties.affinity)
              view.fill(properties.properties)
              await view.delay(10000)
              
@@ -465,12 +464,13 @@ export default class NeoVisComponent extends Vue {
   isBusy=false;
   finalName="teste"
   fields=[ { key: 'originalProperties.cmd', label: 'CMD',sortable: true },{ key: 'originalProperties.cont', label: 'Cont',sortable: true },{key: 'originalProperties.pid', label: 'Pid',sortable: true },{key: 'originalProperties.ppid', label: 'ppid',sortable: true },{key:'originalProperties.rss', label:'RAM',sortable: true}]
-  fields2=[{ key: 'originalProperties.cmd', label: 'CMD',sortable: true },{ key: 'originalProperties.cont', label: 'Cont',sortable: true },{key:'originalProperties.host', label:'Host',sortable:true},{key: 'originalProperties.pid', label: 'Pid',sortable: true },{key: 'originalProperties.ppid', label: 'ppid',sortable: true },{key:'originalProperties.rss', label:'RAM',sortable: true},{key:'originalProperties.cputime', label:'CPU',sortable: true}]
+  fields2=[{ key: 'originalProperties.cmd', label: 'CMD',sortable: true },{ key: 'originalProperties.cont', label: 'Cont',sortable: true },{key:'originalProperties.host', label:'Host',sortable:true},{key: 'originalProperties.pid', label: 'Pid',sortable: true },{key: 'originalProperties.ppid', label: 'ppid',sortable: true },{key:'originalProperties.rss', label:'RAM',sortable: true},{key:'originalProperties.cputime', label:'CPUtime',sortable: true}]
   showTable=false
   isBusy2=false
   estado:any={id:"0",msg:""}
   maximo=100;
   valor=0;
+  index=0;
   replicas=0;
   pods:string[]=[];
   //pod's atributes  when  we clicked
@@ -566,11 +566,13 @@ export default class NeoVisComponent extends Vue {
    * @param {string} cont is an atribute of SYSQUERY, one part of it matches a pod in kubernetes
    * 
    */
-  async  show(cont:any){
+  async  show(cont:any,affinity:any){
     var temp=cont
     var pods:any;
     var type;
     var name;
+    var index:any;
+    var containerName:any;
    
     await axios.get('http://localhost:3001/pods').then(response => 
     (
@@ -580,6 +582,14 @@ export default class NeoVisComponent extends Vue {
     for(let i=0;i<pods.length;i++){
      
       if(pods[i].metadata.uid==temp){
+        for(let j=0;j<pods[i].spec.containers.length;j++){
+          if(pods[i].status.containerStatuses[j].containerID.includes(affinity)){
+            console.log("wowowowo"+pods[i].spec.containers[j].name)
+            containerName=pods[i].spec.containers[j].name;
+            index=j;
+          }
+
+        }
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
         this.namespace=pods[i].metadata.namespace;
@@ -597,19 +607,22 @@ export default class NeoVisComponent extends Vue {
     }
     await axios.get('http://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
-        this.finalName=response.data.metadata.name
+        
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
-        this.finalInformation.limitcpu=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.0.resources.limits.cpu' ),0)
-        this.finalInformation.limitmemory=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.0.resources.limits.memory' ),0)
-        this.finalInformation.requestcpu=this.verify(objectPath.get( response.data,'spec.template.spec.containers.0.resources.requests.cpu'),0)
-        this.finalInformation.requestmemory=this.verify(objectPath.get( response.data,'spec.template.spec.containers.0.resources.requests.memory'),0)
+        this.finalInformation.limitcpu=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.'+index+'.resources.limits.cpu' ),0)
+        this.finalInformation.limitmemory=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.'+index+'.resources.limits.memory' ),0)
+        this.finalInformation.requestcpu=this.verify(objectPath.get( response.data,'spec.template.spec.containers.'+index+'.resources.requests.cpu'),0)
+        this.finalInformation.requestmemory=this.verify(objectPath.get( response.data,'spec.template.spec.containers.'+index+'.resources.requests.memory'),0)
       })
-
+     
+    this.finalName=containerName
     this.originalInformation.replicas=this.finalInformation.replicas
     this.originalInformation.limitcpu=this.finalInformation.limitcpu
     this.originalInformation.limitmemory=this.finalInformation.limitmemory
     this.originalInformation.requestcpu=this.finalInformation.requestcpu
     this.originalInformation.requestmemory=this.finalInformation.requestmemory
+    
+     this.index=index;
     this.modalShow=true
     this.showComplete=true
  }
@@ -623,6 +636,7 @@ export default class NeoVisComponent extends Vue {
 
 
   async updateAll(){
+
     if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
     if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
@@ -649,7 +663,8 @@ export default class NeoVisComponent extends Vue {
  */
 
  async updateLimitCpu(){
-    this.$root.$emit('updateLimitCpu',this.type,this.namespace,this.name,this.finalInformation.limitcpu)
+   console.log("cpuu");
+    this.$root.$emit('updateLimitCpu',this.type,this.namespace,this.name,this.finalInformation.limitcpu,this.index)
   }
 
   /**
@@ -660,7 +675,7 @@ export default class NeoVisComponent extends Vue {
  */
   async updateLimitMemory(){
     
-      this.$root.$emit('updateLimitMemory',this.type,this.namespace,this.name,this.finalInformation.limitmemory)
+      this.$root.$emit('updateLimitMemory',this.type,this.namespace,this.name,this.finalInformation.limitmemory,this.index)
     
   }
 
@@ -672,7 +687,7 @@ export default class NeoVisComponent extends Vue {
  */
 
   async updateRequestCpu(){
-    this.$root.$emit('updateRequestCpu',this.type,this.namespace,this.name,this.finalInformation.requestcpu)
+    this.$root.$emit('updateRequestCpu',this.type,this.namespace,this.name,this.finalInformation.requestcpu,this.index)
     
   }
 
@@ -684,7 +699,7 @@ export default class NeoVisComponent extends Vue {
  */
 
   async updateRequestMemory(){
-    this.$root.$emit('updateRequestMemory',this.type,this.namespace,this.name,this.finalInformation.requestmemory)
+    this.$root.$emit('updateRequestMemory',this.type,this.namespace,this.name,this.finalInformation.requestmemory,this.index)
     
   }
 

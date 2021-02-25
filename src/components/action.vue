@@ -61,13 +61,17 @@ export default class ActionComponent extends Vue {
   }
 
   async getQueue(){
-     axios.get('http://localhost:3001/geral/queue').then(response => 
+    
+    
+     await axios.get('http://localhost:3001/geral/queue').then(response => 
     {
      
       this.queue.number=response.data.number
       this.queue.currentLeft=response.data.currentLeft
       
     }) 
+    console.log("loling"+ this.queue.number)
+   
   }
 
   /**
@@ -83,7 +87,6 @@ export default class ActionComponent extends Vue {
 
   async feedback(title:string,str:string){
      this.estado.id = "1"
-    console.log("heres"+this.estado.id)
     while ( this.estado.id != "4") {
         
         await this.delay( 10000 );
@@ -138,9 +141,10 @@ delay ( time:number ) {
  * 
  */
 
- async updateLimitCpu(type:string,namespace:string,name:string,finalInformation:string){
+ async updateLimitCpu(type:string,namespace:string,name:string,finalInformation:string,index:string){
+    console.log("inside limit");
      this.type=type
-     this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/cpu/'+name+'/'+finalInformation)
+     this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/cpu/'+name+'/'+finalInformation+'/'+index)
     /*  axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/cpu/'+name+'/'+finalInformation).then(response => 
     (
       console.log("tag"+response)
@@ -154,9 +158,9 @@ delay ( time:number ) {
  * (deployment or statefulsets)
  * 
  */
-  async updateLimitMemory(type:string,namespace:string,name:string,finalInformation:string){
+  async updateLimitMemory(type:string,namespace:string,name:string,finalInformation:string,index:string){
     this.type=type
-    this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/memory/'+name+'/'+finalInformation)
+    this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/memory/'+name+'/'+finalInformation+'/'+index)
     /*  axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/memory/'+name+'/'+finalInformation).then(response => 
     (
       console.log(response)
@@ -173,9 +177,10 @@ delay ( time:number ) {
  * 
  */
 
-  async updateRequestCpu(type:string,namespace:string,name:string,finalInformation:string){
+  async updateRequestCpu(type:string,namespace:string,name:string,finalInformation:string,index:string){
+    console.log("inside limit");
       this.type=type
-      this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/cpu/'+name+'/'+finalInformation)
+      this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/cpu/'+name+'/'+finalInformation+'/'+index)
    /*axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/cpu/'+name+'/'+finalInformation).then(response => 
     (
       console.log(response)
@@ -191,9 +196,9 @@ delay ( time:number ) {
  * 
  */
 
-  async updateRequestMemory(type:string,namespace:string,name:string,finalInformation:string){
+  async updateRequestMemory(type:string,namespace:string,name:string,finalInformation:string,index:string){
       this.type=type
-      this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation)
+      this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation+'/'+index)
     /*axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation).then(response => 
     (
       console.log(response)
@@ -213,12 +218,14 @@ delay ( time:number ) {
                 await this.delay( 10000 );
 
                 await this.getState()
+                await this.getQueue()
             }
     this.$root.$emit('onChager')
   }
 
   async created(){
         await this.getQueue()
+        console.log("...."+this.queue.number)
           await this.delay( 5000 );
         if(this.queue.number!="0"){
           this.$root.$emit('onChanger')
