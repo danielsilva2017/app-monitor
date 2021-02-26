@@ -309,7 +309,7 @@ export default class HostsComponent extends Vue {
   }
  verify ( a:any, b:any) { return a != undefined ? a : b }
   async updateAll(){
-    console.log("here"+this.originalInformation.limitcpu+"  "+this.finalInformation.limitcpu)
+    console.log("here"+this.originalInformation.limitcpu+"  "+this.finalInformation.limitcpu                                  )
     if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
     if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
