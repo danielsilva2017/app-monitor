@@ -1,5 +1,4 @@
 # app-monitor
-[![CircleCI](https://img.shields.io/badge/version-1.0.2-blue)]()
 
 ## Post thesis
 
@@ -7,6 +6,10 @@
 * "Vista por processos" now uses the new version of the Api ( attribute index) to correctly choose the container (more testing will be needed)
 * Small bug corrections UI
 * Pod view still limited
+
+[![CircleCI](https://img.shields.io/badge/version-1.0.3-blue)]()
+
+
 
 App-monitor is a web server that allows you to track what is happening  in your Kubernetes infrastructure. It wss written in Vue js and uses a modify version of NeoVis to handle the connection and visualization of the neo4j database.
 To use app-monitor you need to have also with the same environment:
