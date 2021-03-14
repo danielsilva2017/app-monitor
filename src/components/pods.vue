@@ -207,12 +207,22 @@ export default class HostsComponent extends Vue {
 
   fields=[ { key: 'originalProperties.cont', label: 'Cont',sortable: true },{key: 'originalProperties.host', label: 'Host',sortable: true },{key:'originalProperties.rss', label:'RAM',sortable: true}]
 
-  change(){
-      if(this.isEditing==true){
-          this.isEditing=!this.isEditing
-          this.updateAll()
-          this.button="Editar"
+  async change(){
+      
+      if(this.isEditing)
+      {
+       console.log("updating all");
+        if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
+        if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
+        if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
+        if(this.originalInformation.requestcpu!=this.finalInformation.requestcpu) await this.updateRequestCpu()
+        if(this.originalInformation.requestmemory!=this.finalInformation.requestmemory) await this.updateRequestMemory()
+        this.$root.$emit('startQueue')
+        this.isEditing=!this.isEditing
+              this.button="Editar"
+
       }else{
+        console.log("paROU DE   editar"+this.isEditing)
           this.isEditing=!this.isEditing
           this.button="Gravar"
       }
@@ -245,15 +255,16 @@ export default class HostsComponent extends Vue {
     })
     for(let i=0;i<pods.length;i++){
      
-      console.log("uuid"+temp)
+      index=0
       if(pods[i].metadata.uid==temp){
-        for(let j=0;j<pods[i].spec.containers.length;j++){
+        
+        /*for(let j=0;j<pods[i].spec.containers.length;j++){
           if(pods[i].status.containerStatuses[j].containerID.includes(affinity)){
             containerName=pods[i].spec.containers[j].name;
             index=j;
           }
 
-        }
+        }*/
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
         this.podName=pods[i].metadata.ownerReferences[0].name
@@ -263,7 +274,6 @@ export default class HostsComponent extends Vue {
         break;
       }
    }
-   console.log("UAAAA"+this.namespace+this.type)
     if(this.type=="replicaset"){
      var deploymentName;
      console.log('sippphttp://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace)
@@ -275,7 +285,6 @@ export default class HostsComponent extends Vue {
         
     }
    
-  console.log("owowo")
     await axios.get('http://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
         
@@ -308,17 +317,17 @@ export default class HostsComponent extends Vue {
 
   }
  verify ( a:any, b:any) { return a != undefined ? a : b }
-  async updateAll(){
-    console.log("here"+this.originalInformation.limitcpu+"  "+this.finalInformation.limitcpu                                  )
+  /*async updateAll(){
+    console.log("updating all");
     if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
     if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
     if(this.originalInformation.requestcpu!=this.finalInformation.requestcpu) await this.updateRequestCpu()
     if(this.originalInformation.requestmemory!=this.finalInformation.requestmemory) await this.updateRequestMemory()
-    this.$root.$emit('startQueue');
+    this.$root.$emit('startQueue')
     
     
-  }
+  }*/ 
 
   /**
    * 
@@ -401,8 +410,8 @@ delay ( time:number ) {
  */
 
  async updateReplicas(){
-     
-  this.$root.$emit('updateReplicas',this.type,this.namespace,this.name,this.finalInformation.replicas)
+     console.log("updating replicas")
+    this.$root.$emit('updateReplicas',this.type,this.namespace,this.name,this.finalInformation.replicas)
   
 }
 
@@ -415,6 +424,7 @@ delay ( time:number ) {
  */
 
  async updateLimitCpu(){
+   console.log("update cpu")
     this.$root.$emit('updateLimitCpu',this.type,this.namespace,this.name,this.finalInformation.limitcpu,this.index)
   }
 

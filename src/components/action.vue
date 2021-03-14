@@ -122,7 +122,7 @@ delay ( time:number ) {
  */
 
  async updateReplicas(type:string,namespace:string,name:string,finalInformation:string){
-    
+    console.log("inside replicas")
     this.type=type
     this.urls.push('http://localhost:3001/'+type+'/replicas/'+namespace+'/'+name+'/'+finalInformation)
      /* axios.post('http://localhost:3001/'+type+'/replicas/'+namespace+'/'+name+'/'+finalInformation).then(response => 
@@ -159,6 +159,7 @@ delay ( time:number ) {
  * 
  */
   async updateLimitMemory(type:string,namespace:string,name:string,finalInformation:string,index:string){
+    console.log("inside limit mem")
     this.type=type
     this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/memory/'+name+'/'+finalInformation+'/'+index)
     /*  axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/limits/memory/'+name+'/'+finalInformation).then(response => 
@@ -178,7 +179,7 @@ delay ( time:number ) {
  */
 
   async updateRequestCpu(type:string,namespace:string,name:string,finalInformation:string,index:string){
-    console.log("inside limit");
+    console.log("inside requestcpu");
       this.type=type
       this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/cpu/'+name+'/'+finalInformation+'/'+index)
    /*axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/cpu/'+name+'/'+finalInformation).then(response => 
@@ -197,6 +198,7 @@ delay ( time:number ) {
  */
 
   async updateRequestMemory(type:string,namespace:string,name:string,finalInformation:string,index:string){
+    console.log("inside op  ")
       this.type=type
       this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation+'/'+index)
     /*axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation).then(response => 
@@ -208,6 +210,7 @@ delay ( time:number ) {
   }
 
   async startqueue(){
+    console.log("this urls")
     console.log(this.urls)
     this.$root.$emit('onChanger')
     axios.post('http://localhost:3001/geral/queue', { data: this.urls }).then(response => 
@@ -220,7 +223,7 @@ delay ( time:number ) {
                 await this.getState()
                 await this.getQueue()
             }
-    this.$root.$emit('onChager')
+    this.$root.$emit('onChanger')
   }
 
   async created(){
@@ -256,12 +259,14 @@ delay ( time:number ) {
             this.updateValue(this.estado)
             
         } );
+          
         await this.$root.$on( 'updateReplicas',this.updateReplicas);
         await this.$root.$on( 'updateLimitCpu',this.updateLimitCpu);
         await this.$root.$on( 'updateLimitMemory',this.updateLimitMemory);
         await this.$root.$on( 'updateRequestCpu',this.updateRequestCpu);
         await this.$root.$on( 'updateRequestMemory',this.updateRequestMemory);
         await this.$root.$on( 'startQueue',this.startqueue);
+      
         
     }
  

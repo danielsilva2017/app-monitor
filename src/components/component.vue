@@ -115,7 +115,11 @@
                     <div class="text-value-xl">Nome do container</div>
                     <div class="text-uppercase text-muted small">{{finalName}}</div>
                   </div>
-                    <div class="col">
+                  <div class="col">
+                    <div class="text-value-xl">Nome do Pod</div>
+                    <div class="text-uppercase text-muted small">{{podName}}</div>
+                  </div>
+                  <div class="col">
                     <div class="text-value-xl">Tipo de Controlador</div>
                     <div class="text-uppercase text-muted small">{{type}}</div>
                   </div>
@@ -271,7 +275,7 @@ async function draw(view:any) {
         DoubleClickEvent:async (properties:any) => {
           var cmd = properties.properties
           if(properties.properties.fake==undefined && op.onChange==false){
-             await view.show(properties.properties.cont,properties.properties.affinity)
+             await view.show(properties.properties.cont,properties.properties.idcontainer)
              view.fill(properties.properties)
              await view.delay(10000)
              
@@ -472,6 +476,7 @@ export default class NeoVisComponent extends Vue {
   valor=0;
   index=0;
   replicas=0;
+  podName=""
   pods:string[]=[];
   //pod's atributes  when  we clicked
   originalInformation={replicas:null,limitcpu:null,limitmemory:null,requestcpu:null,requestmemory:null}
@@ -566,14 +571,13 @@ export default class NeoVisComponent extends Vue {
    * @param {string} cont is an atribute of SYSQUERY, one part of it matches a pod in kubernetes
    * 
    */
-  async  show(cont:any,affinity:any){
+  async  show(cont:any,idcontainer:any){
     var temp=cont
     var pods:any;
     var type;
     var name;
     var index:any;
     var containerName:any;
-   
     await axios.get('http://localhost:3001/pods').then(response => 
     (
      
@@ -583,13 +587,13 @@ export default class NeoVisComponent extends Vue {
      
       if(pods[i].metadata.uid==temp){
         for(let j=0;j<pods[i].spec.containers.length;j++){
-          if(pods[i].status.containerStatuses[j].containerID.includes(affinity)){
-            console.log("wowowowo"+pods[i].spec.containers[j].name)
+          if(pods[i].status.containerStatuses[j].containerID.includes(idcontainer)){
             containerName=pods[i].spec.containers[j].name;
             index=j;
           }
 
         }
+        this.podName=pods[i].metadata.name
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
         this.namespace=pods[i].metadata.namespace;
@@ -636,7 +640,7 @@ export default class NeoVisComponent extends Vue {
 
 
   async updateAll(){
-
+    console.log("update processes");
     if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
     if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
     if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
@@ -649,7 +653,7 @@ export default class NeoVisComponent extends Vue {
 
   
  async updateReplicas(){
-     
+  console.log("updating replicas")
   this.$root.$emit('updateReplicas',this.type,this.namespace,this.name,this.finalInformation.replicas)
   
 }
@@ -663,7 +667,7 @@ export default class NeoVisComponent extends Vue {
  */
 
  async updateLimitCpu(){
-   console.log("cpuu");
+   console.log("updating l cpu")
     this.$root.$emit('updateLimitCpu',this.type,this.namespace,this.name,this.finalInformation.limitcpu,this.index)
   }
 
@@ -674,7 +678,7 @@ export default class NeoVisComponent extends Vue {
  * 
  */
   async updateLimitMemory(){
-    
+      console.log("updating l memory")
       this.$root.$emit('updateLimitMemory',this.type,this.namespace,this.name,this.finalInformation.limitmemory,this.index)
     
   }
@@ -687,6 +691,7 @@ export default class NeoVisComponent extends Vue {
  */
 
   async updateRequestCpu(){
+    console.log("updating request cpu")
     this.$root.$emit('updateRequestCpu',this.type,this.namespace,this.name,this.finalInformation.requestcpu,this.index)
     
   }
@@ -699,6 +704,7 @@ export default class NeoVisComponent extends Vue {
  */
 
   async updateRequestMemory(){
+    console.log("updating  request memory")
     this.$root.$emit('updateRequestMemory',this.type,this.namespace,this.name,this.finalInformation.requestmemory,this.index)
     
   }

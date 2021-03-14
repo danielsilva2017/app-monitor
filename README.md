@@ -1,6 +1,13 @@
 # app-monitor
 [![CircleCI](https://img.shields.io/badge/version-1.0.2-blue)]()
 
+## Post thesis
+
+* New version of sysquery contains the attribute dockerid
+* "Vista por processos" now uses the new version of the Api ( attribute index) to correctly choose the container (more testing will be needed)
+* Small bug corrections UI
+* Pod view still limited
+
 App-monitor is a web server that allows you to track what is happening  in your Kubernetes infrastructure. It wss written in Vue js and uses a modify version of NeoVis to handle the connection and visualization of the neo4j database.
 To use app-monitor you need to have also with the same environment:
 
@@ -14,7 +21,7 @@ Main features:
 
 - [x] The user can see the information traded betweeen hosts,pods or processes;
 - [x] The user can see a detail information for each  processes,hosts or pods - both on a table and on a graph;
-- [x] The user can edit the recourses allocated to the controllers;
+- [x] The user can edit some recourses allocated to the controllers;
 
 ## Processes View
 ![Process View](https://i.imgur.com/40s5HkS.png)
