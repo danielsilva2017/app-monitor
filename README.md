@@ -6,12 +6,13 @@
 * "Vista por processos" now uses the new version of the Api ( attribute index) to correctly choose the container (more testing will be needed)
 * Small bug corrections UI
 * Pod view still limited
+* Modal shows on filter mode
 
 [![CircleCI](https://img.shields.io/badge/version-1.0.3-blue)]()
 
 
 
-App-monitor is a web server that allows you to track what is happening  in your Kubernetes infrastructure. It wss written in Vue js and uses a modify version of NeoVis to handle the connection and visualization of the neo4j database.
+App-monitor is a web server that allows you to track what is happening  in your Kubernetes infrastructure using sysquery. It was written in Vue js and uses a modify version of NeoVis to handle the connection and visualization of the neo4j database.
 To use app-monitor you need to have also with the same environment:
 
 - [x] YamlChanger - API to connect app-monitor to your Kubernetes Infrastructure
@@ -24,7 +25,7 @@ Main features:
 
 - [x] The user can see the information traded betweeen hosts,pods or processes;
 - [x] The user can see a detail information for each  processes,hosts or pods - both on a table and on a graph;
-- [x] The user can edit some recourses allocated to the controllers;
+- [x] The user can edit some resourses allocated to the controllers;
 
 ## Processes View
 ![Process View](https://i.imgur.com/40s5HkS.png)
@@ -37,9 +38,9 @@ Main features:
 
 ![Host View](https://i.imgur.com/R2qTlDf.png)
 
-## Recources
+## Resources
 
-![Recources](https://i.imgur.com/L4ZllqI.png)
+![Resources](https://i.imgur.com/L4ZllqI.png)
 ## Project setup
 ```
 npm install
