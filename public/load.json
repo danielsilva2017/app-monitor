@@ -1,9 +1,7 @@
 {
     "cassandra": "https://cdn.discordapp.com/attachments/465818808020369412/685077057226407942/unknown.png",
     "spark": "https://cdn.discordapp.com/attachments/465818808020369412/685077694693638150/unknown.png",
-    "postgres": "'../img/postgres.png'",
-    "test": "url",
-    "keyword2": "url2",
     "node": "https://cdn.discordapp.com/attachments/465818808020369412/707605158313590794/unknown.png",
-    "google": "https://cdn.discordapp.com/attachments/465818808020369412/814056668643328040/unknown.png"
+    "google": "https://cdn.discordapp.com/attachments/465818808020369412/814056668643328040/unknown.png",
+    "python": "https://cdn.discordapp.com/attachments/465818808020369412/823188971198218240/unknown.png"
 }
