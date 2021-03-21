@@ -34,11 +34,8 @@ export default class ActionComponent extends Vue {
    */
 
   async updateValue(state:any){
-    if(state.id=="1"){this.valor=25}
-    else if(state.id=="2"){this.valor=50}
-    else if(state.id=="3"){this.valor=75}
-    else if (state.id=="4"){this.valor=100}
-    else{this.valor=0}
+    this.valor=parseInt(state.id)*25;
+    
     this.estado.msg=state.msg
   }
 
@@ -70,7 +67,7 @@ export default class ActionComponent extends Vue {
       this.queue.currentLeft=response.data.currentLeft
       
     }) 
-    console.log("loling"+ this.queue.number)
+    
    
   }
 
@@ -198,7 +195,7 @@ delay ( time:number ) {
  */
 
   async updateRequestMemory(type:string,namespace:string,name:string,finalInformation:string,index:string){
-    console.log("inside op  ")
+    
       this.type=type
       this.urls.push('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation+'/'+index)
     /*axios.post('http://localhost:3001/'+type+'/resources/'+namespace+'/requests/memory/'+name+'/'+finalInformation).then(response => 
@@ -210,19 +207,32 @@ delay ( time:number ) {
   }
 
   async startqueue(){
-    console.log("this urls")
+    
     console.log(this.urls)
+    this.$bvToast.toast( "Mudanças começaram", {
+                title: "Mudanças",
+                variant: 'success',
+                solid: true
+            } );
     this.$root.$emit('onChanger')
-    axios.post('http://localhost:3001/geral/queue', { data: this.urls }).then(response => 
+    await axios.post('http://localhost:3001/geral/queue', { data: this.urls.splice(0, this.urls.length) }).then(response => 
     (
       console.log(response)
     ))
     while ( this.estado.id != "4") {
-                await this.delay( 10000 );
+                await this.delay( 5000 );
 
                 await this.getState()
                 await this.getQueue()
             }
+     this.estado.id=0
+    this.estado.msg="";
+    this.valor=0;
+    this.$bvToast.toast( "Mudanças acabaram, nova versão disponível da base de dados", {
+                title: "Mudanças",
+                variant: 'success',
+                solid: true
+            } );
     this.$root.$emit('onChanger')
   }
 
@@ -233,10 +243,18 @@ delay ( time:number ) {
         if(this.queue.number!="0"){
           this.$root.$emit('onChanger')
            while ( this.estado.id != "4") {
-                await this.delay( 10000 );
+                await this.delay( 5000 );
 
                 await this.getState()
             }
+            this.$bvToast.toast( "Mudanças acabaram, nova versão disponível da base de dados", {
+                title: "Mudanças",
+                variant: 'success',
+                solid: true
+            } );
+        this.estado.id=0
+        this.estado.msg="";
+        this.valor=0;
           this.$root.$emit('onChanger')
         }
         this.$root.$on( 'feedback',async ( title : string, str : string, type:string ) => {

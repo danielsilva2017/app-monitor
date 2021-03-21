@@ -10,7 +10,7 @@
                 </b-card>
                 <b-card  class="bg-secondary small" border-variant="secondary" header="Nome do pod" header-border-variant="secondary" no-body>
                     <b-card-body>
-                        <b-card-text class="small">{{name!= null ? name: 'Nenhum nó selecionado'}}</b-card-text>
+                        <b-card-text class="small">{{podName!= null ? podName: 'Nenhum nó selecionado'}}</b-card-text>
                     </b-card-body>
                 </b-card>
                    <b-card  class="bg-secondary small" border-variant="secondary" header="Ip do pod" header-border-variant="secondary" no-body>
@@ -110,7 +110,7 @@ async function draw(view:any) {
         caption:"cont",
         community:"host",
         clickEvent: (properties:any) => {
-          console.log("Lol")
+          
           if(op.onChange==false){
           view.show(properties.properties.cont,properties.properties.affinity)
           }
@@ -167,6 +167,7 @@ function drawAgain(prop:any){
         thickness: "sent_bytes"
       }
     },
+    
 
     initial_cypher:
       "MATCH p=(p1)-[r:Pod]-(p2) where p1.cont='"+prop+"' RETURN p "
@@ -267,7 +268,7 @@ export default class HostsComponent extends Vue {
         }*/
         this.type=pods[i].metadata.ownerReferences[0].kind.toLowerCase()
         this.name= pods[i].metadata.ownerReferences[0].name
-        this.podName=pods[i].metadata.ownerReferences[0].name
+        this.podName=pods[i].metadata.name
         this.namespace=pods[i].metadata.namespace;
         this.podIP=pods[i].status.podIP;
         
@@ -287,15 +288,15 @@ export default class HostsComponent extends Vue {
    
     await axios.get('http://localhost:3001/'+this.type+'/'+this.name+'/'+this.namespace).then(response => 
       {
-        
-        
+        //this var should be named controller
+        this.originalInformation.podName=response.data.metadata.name
         this.finalInformation.replicas=this.verify(response.data.spec.replicas,0)
         this.finalInformation.limitcpu=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.'+index+'.resources.limits.cpu' ),0)
         this.finalInformation.limitmemory=this.verify(objectPath.get( response.data, 'spec.template.spec.containers.'+index+'.resources.limits.memory' ),0)
         this.finalInformation.requestcpu=this.verify(objectPath.get( response.data,'spec.template.spec.containers.'+index+'.resources.requests.cpu'),0)
         this.finalInformation.requestmemory=this.verify(objectPath.get( response.data,'spec.template.spec.containers.'+index+'.resources.requests.memory'),0)
       })
-    this.originalInformation.podName=containerName
+    //this.originalInformation.podName=containerName
     this.originalInformation.replicas=this.finalInformation.replicas
     this.originalInformation.limitcpu=this.finalInformation.limitcpu
     this.originalInformation.limitmemory=this.finalInformation.limitmemory
@@ -317,90 +318,7 @@ export default class HostsComponent extends Vue {
 
   }
  verify ( a:any, b:any) { return a != undefined ? a : b }
-  /*async updateAll(){
-    console.log("updating all");
-    if(this.originalInformation.replicas!=this.finalInformation.replicas) await this.updateReplicas()
-    if(this.originalInformation.limitcpu!=this.finalInformation.limitcpu) await this.updateLimitCpu()
-    if(this.originalInformation.limitmemory!=this.finalInformation.limitmemory) await this.updateLimitMemory()
-    if(this.originalInformation.requestcpu!=this.finalInformation.requestcpu) await this.updateRequestCpu()
-    if(this.originalInformation.requestmemory!=this.finalInformation.requestmemory) await this.updateRequestMemory()
-    this.$root.$emit('startQueue')
-    
-    
-  }*/ 
 
-  /**
-   * 
-   * Function used to update the value presented in the Progress   depending on the state
-   * @param {string} state current state 
-   * 
-   */
-
-  async updateValue(state:any){
-    if(state.id=="1"){this.valor=25}
-    else if(state.id=="2"){this.valor=50}
-    else if(state.id=="3"){this.valor=75}
-    else if (state.id=="4"){this.valor=100}
-    else{this.valor=0}
-    this.estado.msg=state.msg
-  }
-
-  /**
-   * 
-   * This function is called 10 in 10s after a change is made to update the current state in order to 
-   * update the progress and consequently give feedback to the user. 
-   * 
-   */
-
-  async getState(){
-    axios.get('http://localhost:3001/'+this.type+'/state/state/state').then(response => 
-    {
-      this.estado.id=response.data.id
-      this.estado.msg=response.data.msg
-      
-    })  
-    await this.updateValue(this.estado)
-  }
-
-  /**
-   * 
-   * This function is responsible to update the progress bar text, call getState() to update the state and 
-   * in the end launches a modal to let the user know the task is over with a personalized title and 
-   * message depending on the tasks that was performed
-   * 
-   * @param {string} titulo é o titulo que aperece no modal
-   * @param {string} str mensagem que aparece no modal
-   * 
-   */
-
-  async feedback(title:string,str:string){
-     this.estado.id = "1"
-    
-    while ( this.estado.id != "4") {
-        await this.delay( 10000 );
-
-        await this.getState()
-    }
-    console.log("completed the cicle")
-    this.$bvToast.toast( str, {
-        title: title,
-        variant: 'success',
-        solid: true
-    } );
-    this.estado.id="0"
-    this.estado.msg="";
-    this.updateValue(this.estado)
-  }
-
-/**
-* 
-* Function that returns a promisse to timeout the function call for 10s 
-* 
-*/ 
-
-delay ( time:number ) {
-    return new Promise( resolve => setTimeout( resolve, time ) )
-}
 
 /**
  * 

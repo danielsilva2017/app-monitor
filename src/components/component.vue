@@ -340,7 +340,7 @@ async function drawInsideModal(cmd:any){
   await viz.render(array,"normal","viz2");
 
 }
-function drawAgain(size:any, instance1:any, instance2:any,process1:any,process2:any,orderBy:any) {
+async function drawAgain(size:any, instance1:any, instance2:any,process1:any,process2:any,orderBy:any) {
   var conditions;
   if (size == undefined) {
     size="cputime"
@@ -374,21 +374,25 @@ function drawAgain(size:any, instance1:any, instance2:any,process1:any,process2:
         caption: "cmd",
         size: size,
         community: "host",
-        clickEvent:(properties:any) =>{
-            if(properties.properties.fake==undefined){
-              
-              op.show(properties.properties.cont)
-              op.choosenNode=properties.properties.cmd
-              op.fill(properties.properties)
+        DoubleClickEvent:async (properties:any) => {
+          var cmd = properties.properties
+          if(properties.properties.fake==undefined && op.onChange==false){
+             await op.show(properties.properties.cont,properties.properties.idcontainer)
+             op.fill(properties.properties)
+             await op.delay(10000)
+             
+             drawInsideModal(properties.properties.cmd)
           }
-
+          if(op.onChange!=false){
+            op.itsOnChange()
+          }
         }
       }
     },
     relationships: {
        NoSocket2: {
         caption: false,
-        thickness: "finish"
+        thickness: "sent_bytes"
       }
     },
     initial_cypher:
