@@ -2,11 +2,11 @@
 
 ## Post thesis
 
-* New version of sysquery contains the attribute dockerid
-* "Vista por processos" now uses the new version of the Api ( attribute index) to correctly choose the container (more testing will be needed)
-* Small bug corrections UI
-* Pod view still limited
-* Modal shows on filter mode
+* New version of sysquery contains the attribute dockerid;
+* "Vista por processos" now uses the new version of the Api ( attribute index) to correctly choose the container (more testing will be needed);
+* Small bug corrections UI;
+* Pod view still limited;
+* Modal shows if you click in a node that was filtered;
 
 [![CircleCI](https://img.shields.io/badge/version-1.0.3-blue)]()
 
