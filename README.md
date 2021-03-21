@@ -3,7 +3,7 @@
 ## Post thesis
 
 * New version of sysquery contains the attribute dockerid;
-* "Vista por processos" now uses the new version of the Api ( attribute index) to correctly choose the container (more testing will be needed);
+* "Vista por processos" now uses the new version of the Api (attribute index) to correctly choose the container;
 * Small bug corrections UI;
 * Pod view still limited;
 * Modal shows if you click in a node, after using the filter option;
@@ -12,19 +12,19 @@
 
 
 
-App-monitor is a web server that allows you to track what is happening  in your Kubernetes infrastructure using sysquery. It was written in Vue js and uses a modify version of NeoVis to handle the connection and visualization of the neo4j database.
-To use app-monitor you need to have also with the same environment:
+App-monitor is a web server that allows you to track what is happening  in your Kubernetes infrastructure using sysquery. It was written in Vue js and uses a modify version of NeoVis (https://github.com/neo4j-contrib/neovis.js/) to handle the connection and visualization of the neo4j database.
+To use app-monitor you need to also have in the same environment:
 
 - [x] YamlChanger - API to connect app-monitor to your Kubernetes Infrastructure
 - [x] Access granted to use sysquery - agent that collects data from Kubernetes and stores it on neo4j.
 
-Without this projects you will not see anything or be able to work in the web server 
+Without these projects you will not see anything or be able to work in the web server 
 
 
 Main features:
 
 - [x] The user can see the information traded betweeen hosts,pods or processes;
-- [x] The user can see a detail information for each  processes,hosts or pods - both on a table and on a graph;
+- [x] The user can see a detail information for each  processes, hosts or pods - both on a table and on a graph;
 - [x] The user can edit some resourses allocated to the controllers;
 
 ## Processes View
